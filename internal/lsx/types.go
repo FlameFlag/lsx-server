@@ -13,6 +13,7 @@ type Config struct {
 	AdminPassword  string
 	AdminPath      string
 	SessionSecret  string
+	OpenAPIYAML    []byte
 }
 
 type Server struct {
@@ -23,6 +24,7 @@ type Server struct {
 	adminPassword  string
 	adminPath      string
 	sessionSecret  []byte
+	openAPIYAML    []byte
 }
 
 type EventSink func(Event)

@@ -3,6 +3,7 @@ package lsx
 import (
 	"net/http"
 	"net/http/httptest"
+	"os"
 	"path/filepath"
 	"strings"
 	"testing"
@@ -464,5 +465,37 @@ func TestOpenAPIYAMLRoute(t *testing.T) {
 	if body := rr.Body.String(); !strings.Contains(body, "openapi: 3.1.0") ||
 		!strings.Contains(body, "/api/v1/leaderboard") {
 		t.Fatalf("/openapi.yaml did not serve the OpenAPI document")
+	}
+}
+
+func TestOpenAPIYAMLRouteUsesConfiguredContract(t *testing.T) {
+	wd, err := os.Getwd()
+	if err != nil {
+		t.Fatal(err)
+	}
+	t.Cleanup(func() {
+		if err := os.Chdir(wd); err != nil {
+			t.Fatalf("restore working directory: %v", err)
+		}
+	})
+	if err := os.Chdir(t.TempDir()); err != nil {
+		t.Fatal(err)
+	}
+
+	srv, err := NewServer(Config{
+		DBPath:      filepath.Join(t.TempDir(), "lsx.sqlite3"),
+		OpenAPIYAML: []byte("openapi: 3.1.0\ninfo:\n  title: embedded test\n"),
+	})
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer func() { _ = srv.Close() }()
+
+	rr := getRoute(t, srv, "/openapi.yaml")
+	if rr.Code != http.StatusOK {
+		t.Fatalf("/openapi.yaml status = %d, want 200", rr.Code)
+	}
+	if body := rr.Body.String(); !strings.Contains(body, "title: embedded test") {
+		t.Fatalf("/openapi.yaml body = %q, want configured contract", body)
 	}
 }

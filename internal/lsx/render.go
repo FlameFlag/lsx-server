@@ -203,7 +203,7 @@ func (s *Server) handleOpenAPIYAML(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "method not allowed", http.StatusMethodNotAllowed)
 		return
 	}
-	data, err := readOpenAPIYAML()
+	data, err := s.readOpenAPIYAML()
 	if err != nil {
 		s.emit(r, "openapi_error", http.StatusNotFound, err.Error())
 		http.NotFound(w, r)
@@ -214,7 +214,10 @@ func (s *Server) handleOpenAPIYAML(w http.ResponseWriter, r *http.Request) {
 	http.ServeContent(w, r, "openapi.yaml", time.Time{}, bytes.NewReader(data))
 }
 
-func readOpenAPIYAML() ([]byte, error) {
+func (s *Server) readOpenAPIYAML() ([]byte, error) {
+	if len(s.openAPIYAML) > 0 {
+		return s.openAPIYAML, nil
+	}
 	dir, err := os.Getwd()
 	if err != nil {
 		return nil, err

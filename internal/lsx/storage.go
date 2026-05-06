@@ -57,6 +57,7 @@ func NewServer(cfg Config) (*Server, error) {
 		adminPassword:  cfg.AdminPassword,
 		adminPath:      adminPath,
 		sessionSecret:  []byte(strutil.FirstNonEmpty(cfg.SessionSecret, randomSecret())),
+		openAPIYAML:    slices.Clone(cfg.OpenAPIYAML),
 	}
 	if err := srv.migrate(); err != nil {
 		_ = db.Close()

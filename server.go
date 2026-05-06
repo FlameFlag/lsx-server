@@ -26,6 +26,7 @@ func runTUI(ctx context.Context, opts serveOptions) error {
 		AdminUser:      opts.adminUser,
 		AdminPassword:  opts.adminPassword,
 		AdminPath:      opts.adminPath,
+		OpenAPIYAML:    openAPIYAML,
 		EventSink: func(ev lsx.Event) {
 			select {
 			case events <- ev:
@@ -77,6 +78,7 @@ func runPlainServer(ctx context.Context, opts serveOptions) error {
 		AdminUser:      opts.adminUser,
 		AdminPassword:  opts.adminPassword,
 		AdminPath:      opts.adminPath,
+		OpenAPIYAML:    openAPIYAML,
 	})
 	if err != nil {
 		return err
