@@ -1,0 +1,81 @@
+# OS metadata
+.DS_Store
+.AppleDouble
+.LSOverride
+._*
+.Spotlight-V100/
+.Trashes/
+ehthumbs.db
+Thumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+
+# Editor and local workspace files
+.idea/
+.vscode/*
+!.vscode/
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+*.swp
+*.swo
+*~
+
+# Environment and local config
+.env
+.env.*
+!.env.example
+!.env.template
+
+# Logs, process files, and scratch space
+*.log
+*.pid
+*.tmp
+*.temp
+*.bak
+tmp/
+temp/
+.cache/
+
+# Go build and test output
+bin/
+build/
+dist/
+*.test
+*.out
+coverage.out
+coverage.html
+*.coverprofile
+
+# Server binaries built on macOS/Linux/Windows
+/lsx_server_go
+/lsx_server_go.exe
+*.exe
+*.dll
+*.so
+*.dylib
+*.a
+*.o
+*.obj
+*.lib
+*.pdb
+*.ilk
+*.dmp
+*.dump
+core
+core.*
+
+# Databases and generated data
+data/
+*.sqlite
+*.sqlite3
+*.sqlite3-*
+*.db
+*.db-*
+*.csv
+*.tsv
+
+# Generated browser vendor assets embedded into local release binaries
+assets/project/findings/vendor/shiki/*
+!assets/project/findings/vendor/shiki/README.md

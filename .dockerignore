@@ -1,0 +1,15 @@
+.git
+.github
+.jj
+.vscode
+.DS_Store
+data
+Dockerfile
+compose.yaml
+*.sqlite3
+*.db
+*.log
+lsx-server
+lsx_server_go
+dist
+tmp

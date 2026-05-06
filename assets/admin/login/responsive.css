@@ -1,0 +1,26 @@
+@media (max-width: 620px) {
+  body {
+    overflow-y: auto;
+  }
+
+  .login-shell {
+    width: calc(100vw - 16px);
+  }
+
+  .login-logo {
+    width: 224px;
+    margin-bottom: -38px;
+  }
+
+  .box {
+    padding: 64px 24px 34px;
+  }
+
+  .brand {
+    margin-right: 0;
+  }
+
+  .brand h1 {
+    font-size: 17px;
+  }
+}

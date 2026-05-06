@@ -1,0 +1,32 @@
+/*
+  Legacy LSX stylesheet for Lemonade Tycoon 2's embedded browser.
+  Reverse-engineering notes identify TeneonIERelease.dll as an MFC
+  CWebBrowser/IEBrowserContainer wrapper, so this must stay readable by IE:
+  no modern selectors, layout systems, CSS variables, media queries, or
+  JavaScript-dependent styling.
+*/
+@font-face {
+  font-family: "LT2 Noto Sans";
+  src:
+    url("/project/asset/fonts/NotoSans-Bold.woff2") format("woff2"),
+    url("/project/asset/fonts/NotoSans-Bold.ttf") format("truetype");
+  font-weight: bold;
+}
+
+body {
+  background: #deffa5;
+  margin: 0;
+  font: bold 11px "LT2 Noto Sans";
+  color: #6b9e21;
+}
+table {
+  border-collapse: collapse;
+  width: 675px;
+}
+td {
+  padding: 2px 6px;
+}
+.k {
+  width: 120px;
+  color: #315f00;
+}

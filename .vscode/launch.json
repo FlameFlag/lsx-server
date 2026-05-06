@@ -1,0 +1,64 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Go: Debug server on :8080",
+      "type": "go",
+      "request": "launch",
+      "mode": "debug",
+      "program": "${workspaceFolder}",
+      "cwd": "${workspaceFolder}",
+      "args": [
+        "--plain",
+        "--addr",
+        "127.0.0.1:8080",
+        "--data",
+        "${workspaceFolder}/data/lsx.sqlite3"
+      ]
+    },
+    {
+      "name": "Go: Debug seeded server on :8080",
+      "type": "go",
+      "request": "launch",
+      "mode": "debug",
+      "program": "${workspaceFolder}",
+      "cwd": "${workspaceFolder}",
+      "args": [
+        "--plain",
+        "--seed",
+        "--addr",
+        "127.0.0.1:8080",
+        "--data",
+        "${workspaceFolder}/data/lsx.sqlite3"
+      ]
+    },
+    {
+      "name": "Go: Debug admin server on :8080",
+      "type": "go",
+      "request": "launch",
+      "mode": "debug",
+      "program": "${workspaceFolder}",
+      "cwd": "${workspaceFolder}",
+      "args": [
+        "--plain",
+        "--addr",
+        "127.0.0.1:8080",
+        "--data",
+        "${workspaceFolder}/data/lsx.sqlite3",
+        "--admin-user",
+        "admin",
+        "--admin-password",
+        "admin",
+        "--admin-path",
+        "/manage-secret"
+      ]
+    },
+    {
+      "name": "Go: Debug current test package",
+      "type": "go",
+      "request": "launch",
+      "mode": "test",
+      "program": "${fileDirname}"
+    }
+  ]
+}

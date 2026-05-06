@@ -1,0 +1,228 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "go: generate assets",
+      "type": "process",
+      "command": "go",
+      "args": [
+        "generate",
+        "./assets"
+      ],
+      "group": "build",
+      "problemMatcher": [],
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared"
+      }
+    },
+    {
+      "label": "go: test all",
+      "type": "process",
+      "command": "go",
+      "args": [
+        "test",
+        "./..."
+      ],
+      "group": {
+        "kind": "test",
+        "isDefault": true
+      },
+      "problemMatcher": [],
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared"
+      }
+    },
+    {
+      "label": "go: vet all",
+      "type": "process",
+      "command": "go",
+      "args": [
+        "vet",
+        "./..."
+      ],
+      "group": "test",
+      "problemMatcher": [],
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared"
+      }
+    },
+    {
+      "label": "go: mod tidy",
+      "type": "process",
+      "command": "go",
+      "args": [
+        "mod",
+        "tidy"
+      ],
+      "group": "build",
+      "problemMatcher": [],
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared"
+      }
+    },
+    {
+      "label": "go: build dev binary",
+      "type": "process",
+      "command": "go",
+      "args": [
+        "build",
+        "-o",
+        "${workspaceFolder}/dist/lsx-server",
+        "."
+      ],
+      "dependsOn": [
+        "go: generate assets"
+      ],
+      "group": {
+        "kind": "build",
+        "isDefault": true
+      },
+      "problemMatcher": [],
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared"
+      }
+    },
+    {
+      "label": "go: run server :8080",
+      "type": "process",
+      "command": "go",
+      "args": [
+        "run",
+        ".",
+        "--plain",
+        "--addr",
+        "127.0.0.1:8080",
+        "--data",
+        "${workspaceFolder}/data/lsx.sqlite3"
+      ],
+      "isBackground": true,
+      "problemMatcher": [],
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "clear": true
+      }
+    },
+    {
+      "label": "go: run seeded server :8080",
+      "type": "process",
+      "command": "go",
+      "args": [
+        "run",
+        ".",
+        "--plain",
+        "--seed",
+        "--addr",
+        "127.0.0.1:8080",
+        "--data",
+        "${workspaceFolder}/data/lsx.sqlite3"
+      ],
+      "isBackground": true,
+      "problemMatcher": [],
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "clear": true
+      }
+    },
+    {
+      "label": "docker: compose up",
+      "type": "process",
+      "command": "docker",
+      "args": [
+        "compose",
+        "up",
+        "-d",
+        "--build"
+      ],
+      "group": "build",
+      "problemMatcher": [],
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared"
+      }
+    },
+    {
+      "label": "docker: compose logs",
+      "type": "process",
+      "command": "docker",
+      "args": [
+        "compose",
+        "logs",
+        "-f"
+      ],
+      "isBackground": true,
+      "problemMatcher": [],
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated"
+      }
+    },
+    {
+      "label": "nix: flake check",
+      "type": "process",
+      "command": "nix",
+      "args": [
+        "flake",
+        "check"
+      ],
+      "group": "test",
+      "problemMatcher": [],
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared"
+      }
+    },
+    {
+      "label": "release: build current platform",
+      "type": "shell",
+      "command": "${workspaceFolder}/build.sh",
+      "windows": {
+        "command": "powershell",
+        "args": [
+          "-NoProfile",
+          "-ExecutionPolicy",
+          "Bypass",
+          "-File",
+          "${workspaceFolder}\\build.ps1"
+        ]
+      },
+      "group": "build",
+      "problemMatcher": [],
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared"
+      }
+    },
+    {
+      "label": "release: build current platform without tests",
+      "type": "shell",
+      "command": "${workspaceFolder}/build.sh",
+      "args": [
+        "--skip-tests"
+      ],
+      "windows": {
+        "command": "powershell",
+        "args": [
+          "-NoProfile",
+          "-ExecutionPolicy",
+          "Bypass",
+          "-File",
+          "${workspaceFolder}\\build.ps1",
+          "-SkipTests"
+        ]
+      },
+      "group": "build",
+      "problemMatcher": [],
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared"
+      }
+    }
+  ]
+}

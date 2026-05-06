@@ -1,0 +1,85 @@
+.side-rail {
+  display: grid;
+  gap: 12px;
+}
+
+.stats {
+  display: grid;
+  gap: 10px;
+}
+
+.stat,
+.bank-panel {
+  border: 3px solid #dffff0;
+  border-radius: 12px;
+  background:
+    linear-gradient(rgba(255, 255, 255, 0.22), transparent 43%),
+    repeating-linear-gradient(
+      0deg,
+      rgba(236, 255, 196, 0.96) 0 8px,
+      rgba(221, 245, 161, 0.96) 8px 16px
+    );
+  box-shadow:
+    inset 0 0 0 1px #8fbe33,
+    0 4px 0 rgba(49, 95, 0, 0.34);
+}
+
+.stat {
+  min-height: 66px;
+  padding: 10px 14px 9px;
+  position: relative;
+}
+
+.stat::after {
+  content: "";
+  position: absolute;
+  right: 12px;
+  top: 14px;
+  width: 20px;
+  height: 20px;
+  border-radius: 5px;
+  background: linear-gradient(#86f05b, #24b52a 58%, #089018);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.75),
+    0 1px 2px rgba(49, 95, 0, 0.38);
+}
+
+.stat span {
+  display: block;
+  color: #5e8d16;
+}
+
+.stat b {
+  display: block;
+  margin-top: 4px;
+  color: #315f00;
+  font-size: 18px;
+}
+
+.stat .last-submission {
+  padding-right: 20px;
+  font-size: 12px;
+  line-height: 1.25;
+  overflow-wrap: anywhere;
+}
+
+.bank-panel {
+  padding: 14px 17px 15px;
+}
+
+.bank-panel b,
+.bank-panel span {
+  display: block;
+}
+
+.bank-panel b {
+  margin-bottom: 8px;
+  color: #315f00;
+  font-size: 14px;
+}
+
+.bank-panel span {
+  color: #446e04;
+  font-weight: normal;
+  line-height: 1.55;
+}

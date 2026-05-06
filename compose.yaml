@@ -1,0 +1,45 @@
+services:
+  lsx-server:
+    build:
+      context: .
+      args:
+        VERSION: ${LSX_VERSION:-dev}
+    image: lsx-server-go:${LSX_VERSION:-dev}
+    ports:
+      - "${LSX_HTTP_PORT:-80}:80"
+    environment:
+      LSX_VERSION: ${LSX_VERSION:-dev}
+      LSX_ADDR: ${LSX_ADDR:-:80}
+      LSX_DATA: ${LSX_DATA:-/app/data/lsx.sqlite3}
+      LSX_SEED: ${LSX_SEED:-false}
+      LSX_STRICT_CHECKSUM: ${LSX_STRICT_CHECKSUM:-false}
+      LSX_PLAIN: ${LSX_PLAIN:-true}
+      LSX_ADMIN_USER: ${LSX_ADMIN_USER:-}
+      LSX_ADMIN_PASSWORD: ${LSX_ADMIN_PASSWORD:-}
+      LSX_ADMIN_PATH: ${LSX_ADMIN_PATH:-}
+      LSX_DISCORD_WEBHOOK: ${LSX_DISCORD_WEBHOOK:-}
+      LSX_DISCORD_EVENTS: ${LSX_DISCORD_EVENTS:-sync,sync_rejected,sync_error,account,account_error}
+      LSX_DISCORD_ICON: ${LSX_DISCORD_ICON:-embedded}
+      LSX_DISCORD_TIMEOUT: ${LSX_DISCORD_TIMEOUT:-5s}
+    read_only: true
+    tmpfs:
+      - /tmp
+    cap_drop:
+      - ALL
+    security_opt:
+      - no-new-privileges:true
+    pids_limit: 128
+    volumes:
+      - ./data:/app/data
+    restart: unless-stopped
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
+    healthcheck:
+      test: ["CMD", "wget", "-q", "-O", "/dev/null", "http://127.0.0.1/healthz"]
+      interval: 30s
+      timeout: 3s
+      retries: 3
+      start_period: 5s

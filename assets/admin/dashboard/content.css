@@ -1,0 +1,96 @@
+.playfield {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 270px;
+  gap: 22px;
+  align-items: start;
+  margin-top: 0;
+}
+
+.main-window {
+  min-width: 0;
+  min-height: 512px;
+  padding: 42px 28px 30px;
+  position: relative;
+  z-index: 2;
+  border: 3px solid #d9ff94;
+  border-radius: 24px;
+  background:
+    linear-gradient(
+      rgba(255, 255, 255, 0.26),
+      transparent 30%,
+      rgba(68, 126, 0, 0.08) 74%
+    ),
+    repeating-linear-gradient(0deg, #c8ef67 0 12px, #abe03d 12px 24px);
+  box-shadow:
+    inset 0 3px 0 rgba(255, 255, 255, 0.84),
+    inset 0 -8px 0 rgba(60, 129, 0, 0.26),
+    0 5px 0 rgba(20, 75, 0, 0.8),
+    0 18px 30px rgba(0, 20, 10, 0.4);
+}
+
+.main-window::before {
+  content: "";
+  position: absolute;
+  left: 18px;
+  right: 18px;
+  top: 8px;
+  height: 24px;
+  border-radius: 16px 16px 0 0;
+  background: rgba(237, 255, 175, 0.24);
+  pointer-events: none;
+}
+
+.view-title {
+  margin: 0;
+  position: absolute;
+  left: 34px;
+  top: 17px;
+  z-index: 2;
+  color: #ffffff;
+  font-size: 19px;
+  line-height: 1;
+  font-weight: 700;
+  font-family: var(--lt2-menu-font);
+  font-stretch: condensed;
+  text-shadow:
+    0 2px 0 #629300,
+    0 3px 4px rgba(37, 73, 0, 0.5);
+}
+
+.content {
+  min-height: 452px;
+  padding: 18px;
+  border: 3px solid #ffffff;
+  border-radius: 20px;
+  background:
+    linear-gradient(rgba(255, 255, 255, 0.26), transparent 35%), #defca8;
+  box-shadow:
+    inset 0 0 0 1px rgba(151, 190, 61, 0.45),
+    inset 0 18px 40px rgba(255, 255, 255, 0.18),
+    0 2px 0 rgba(66, 126, 0, 0.22);
+  color: #214413;
+  text-shadow: var(--lt2-pixel-shadow);
+  overflow-x: auto;
+}
+
+.flash {
+  margin: 0 0 12px;
+  padding: 9px 12px;
+  border: 2px solid #93bd31;
+  border-radius: 10px;
+  background:
+    linear-gradient(rgba(255, 255, 255, 0.34), transparent 48%),
+    repeating-linear-gradient(0deg, #f4ffd2 0 8px, #e5ffb1 8px 16px);
+  box-shadow: 0 2px 0 rgba(49, 95, 0, 0.16);
+  color: #376b08;
+  text-shadow: var(--lt2-pixel-shadow);
+}
+
+.panel {
+  min-width: 760px;
+  border: 1px solid rgba(61, 111, 29, 0.25);
+  border-radius: 6px;
+  background: #fbfff0;
+  box-shadow: 0 2px 0 rgba(80, 139, 0, 0.12);
+  overflow: hidden;
+}

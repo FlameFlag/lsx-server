@@ -1,0 +1,66 @@
+<header class="findings-hero">
+  <p class="findings-kicker">{{.Kicker}}</p>
+  <h2>{{.Title}}</h2>
+  <p class="findings-updated">Updated {{.Updated}}</p>
+  {{range .Intro}}
+  <p class="findings-intro">{{.}}</p>
+  {{end}}
+  {{template "compactTable" statsTable $.Stats}}
+</header>
+
+<nav class="findings-nav" aria-label="Findings sections">
+  {{range .Sections}}
+  <a href="#{{.ID}}">{{.NavTitle}}</a>
+  {{end}}
+</nav>
+
+{{range .Sections}}
+<section class="finding-section" id="{{.ID}}">
+  <h2>{{.Title}}</h2>
+  {{with .Summary}}<p class="section-summary">{{.}}</p>{{end}}
+  {{with .Takeaway}}<p class="section-takeaway">{{.}}</p>{{end}}
+  {{range .Body}}
+  <p class="section-body">{{.}}</p>
+  {{end}}
+  {{with .Findings}}
+  <ul class="finding-list">
+    {{range .}}<li>{{.}}</li>{{end}}
+  </ul>
+  {{end}}
+  {{with .Table}}{{template "table" .}}{{end}}
+  {{range .Snippets}}
+  {{with .Title}}<h3 class="snippet-title">{{.}}</h3>{{end}}
+  <pre class="findings-code"{{with .Language}} data-code-language="{{.}}"{{end}}><code>{{.Code}}</code></pre>
+  {{end}}
+</section>
+{{end}}
+
+{{define "table"}}
+<div class="findings-table-wrap">
+  <table class="findings-table">
+    <thead>
+      <tr>{{range .Headers}}<th>{{.}}</th>{{end}}</tr>
+    </thead>
+    <tbody>
+      {{range .Rows}}
+      <tr>{{range .}}<td>{{.}}</td>{{end}}</tr>
+      {{end}}
+    </tbody>
+  </table>
+</div>
+{{end}}
+
+{{define "compactTable"}}
+<div class="findings-table-wrap">
+  <table class="findings-table compact">
+    <thead>
+      <tr>{{range .Headers}}<th>{{.}}</th>{{end}}</tr>
+    </thead>
+    <tbody>
+      {{range .Rows}}
+      <tr>{{range .}}<td>{{.}}</td>{{end}}</tr>
+      {{end}}
+    </tbody>
+  </table>
+</div>
+{{end}}

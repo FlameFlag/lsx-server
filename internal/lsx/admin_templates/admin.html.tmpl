@@ -1,0 +1,184 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{{.Title}}</title>
+  <link rel="stylesheet" href="{{.AdminPath}}/asset/admin.css">
+</head>
+
+<body>
+  <div class="game-shell">
+    <header class="game-header">
+      <img class="brand-panel" src="/project/asset/lt2_logo_text_only.avif"
+        alt="Lemonade Tycoon 2 New York Edition">
+      <nav class="game-tabs" aria-label="Admin sections">
+        <a class="game-tab {{if eq .Active "submissions"}}active{{end}}" href="{{.AdminPath}}/submissions">
+          <span>Submissions</span>
+          <i class="tab-icon"><img src="/project/asset/lt2_icon_lsx.avif" alt=""></i>
+        </a>
+        <a class="game-tab {{if eq .Active "accounts"}}active{{end}}" href="{{.AdminPath}}/accounts">
+          <span>Accounts</span>
+          <i class="tab-icon"><img src="/project/asset/lt2_icon_play.avif" alt=""></i>
+        </a>
+        <a class="game-tab {{if eq .Active "events"}}active{{end}}" href="{{.AdminPath}}/events">
+          <span>Request Logs</span>
+          <i class="tab-icon"><img src="/project/asset/lt2_icon_findings.avif" alt=""></i>
+        </a>
+        <form class="logout game-tab" method="post" action="{{.AdminPath}}/logout">
+          <button><span>Quit</span><i class="tab-icon"><img class="quit-img"
+                src="/project/asset/lt2_lemon_pair.avif" alt=""></i></button>
+        </form>
+      </nav>
+    </header>
+
+    <main class="playfield">
+      <section class="main-window">
+        <h1 class="view-title">{{if eq .Active "submissions"}}Submissions{{else if eq .Active
+          "accounts"}}Accounts{{else}}Request Logs{{end}}</h1>
+        <div class="content">
+          {{if .Flash}}<div class="flash">{{.Flash}}</div>{{end}}
+          {{if eq .Active "submissions"}}
+          <form class="action seed" method="post" action="{{.AdminPath}}/action">
+            <input type="hidden" name="csrf" value="{{.CSRF}}">
+            <input type="hidden" name="action" value="seed">
+            <input type="hidden" name="back" value="{{.AdminPath}}/submissions">
+            <button>Seed recovered Wayback rows</button>
+          </form>
+          <section class="panel">
+            <table class="submissions-table">
+              <tr>
+                <th>ID</th>
+                <th>Company</th>
+                <th>Market</th>
+                <th>Checksum</th>
+                <th>Delete</th>
+              </tr>
+              {{range .Submissions}}{{$sub := .}}
+              <tr>
+                <td class="nowrap">#{{.ID}}<br><span class="muted">{{.When}}</span><br><span
+                    class="muted">{{.Remote}}</span></td>
+                <td><b>{{.Row.Company}}</b><br>{{.Row.CEO}}<br><span class="muted">{{.Host}}</span></td>
+                <td class="money">${{money .Row.MarketCents}}</td>
+                <td>{{if .Valid}}<b class="ok">valid</b>{{else}}<b class="bad warn"><img src="{{$.AdminPath}}/asset/warning.avif"
+                      alt="">mismatch</b>{{end}}<br><span class="muted">client {{.Client}}</span><br><span
+                    class="muted">computed {{.Computed}}</span></td>
+                <td>
+                  <form class="danger" method="post" action="{{$.AdminPath}}/action"><input type="hidden" name="csrf"
+                      value="{{$.CSRF}}"><input type="hidden" name="action" value="delete_submission"><input
+                      type="hidden" name="back" value="{{$.AdminPath}}/submissions"><input type="hidden" name="id"
+                      value="{{.ID}}"><button class="icon-button icon-delete">Delete</button></form>
+                </td>
+              </tr>
+              <tr class="edit-row">
+                <td colspan="5">
+                  <details class="edit-details">
+                    <summary>Edit fields</summary>
+                    <form method="post" action="{{$.AdminPath}}/action">
+                      <input type="hidden" name="csrf" value="{{$.CSRF}}">
+                      <input type="hidden" name="action" value="update_submission">
+                      <input type="hidden" name="back" value="{{$.AdminPath}}/submissions">
+                      <input type="hidden" name="id" value="{{.ID}}">
+                      <div class="grid">{{range $.Fields}}<div class="field"><label>{{.}}</label><input name="{{.}}"
+                            value="{{field $sub.Fields .}}"></div>{{end}}</div>
+                      <p class="action save"><button class="icon-save">Save submission</button></p>
+                    </form>
+                  </details>
+                </td>
+              </tr>
+              {{end}}
+            </table>
+          </section>
+          {{else if eq .Active "accounts"}}
+          <section class="panel">
+            <table class="accounts-table">
+              <tr>
+                <th>ID</th>
+                <th>Received</th>
+                <th>Remote</th>
+                <th>Username</th>
+                <th>Password</th>
+                <th>Raw query</th>
+                <th>Delete</th>
+              </tr>
+              {{range .Accounts}}
+              <tr>
+                <td>#{{.ID}}</td>
+                <td>{{time .ReceivedAt}}</td>
+                <td>{{.RemoteAddr}}</td>
+                <td><b>{{.Username}}</b></td>
+                <td>{{.Password}}</td>
+                <td class="query muted">{{.RawQuery}}</td>
+                <td>
+                  <form class="danger" method="post" action="{{$.AdminPath}}/action"><input type="hidden" name="csrf"
+                      value="{{$.CSRF}}"><input type="hidden" name="action" value="delete_account"><input type="hidden"
+                      name="back" value="{{$.AdminPath}}/accounts"><input type="hidden" name="id" value="{{.ID}}"><button
+                      class="icon-button icon-delete">Delete</button></form>
+                </td>
+              </tr>
+              {{end}}
+            </table>
+          </section>
+          {{else if eq .Active "events"}}
+          <form class="action seed danger" method="post" action="{{.AdminPath}}/action"><input type="hidden" name="csrf"
+              value="{{.CSRF}}"><input type="hidden" name="action" value="clear_events"><input type="hidden" name="back"
+              value="{{.AdminPath}}/events"><button>Clear all request logs</button></form>
+          <section class="panel">
+            <table class="events-table">
+              <tr>
+                <th>ID</th>
+                <th>Time</th>
+                <th>Kind</th>
+                <th>Status</th>
+                <th>Remote</th>
+                <th>Path</th>
+                <th>Message</th>
+                <th>Delete</th>
+              </tr>
+              {{range .Events}}
+              <tr>
+                <td>#{{.ID}}</td>
+                <td>{{time .Time}}</td>
+                <td>{{.Kind}}</td>
+                <td>{{.Status}}</td>
+                <td>{{.RemoteAddr}}</td>
+                <td><b>{{.Route}}</b>{{if .Summary}}<div class="event-summary">{{range .Summary}}<span><b>{{.Label}}</b>
+                      {{.Value}}</span>{{end}}</div>{{end}}<details class="raw-path">
+                    <summary>Raw request</summary><code>{{.Raw}}</code>
+                  </details>
+                </td>
+                <td>{{.Message}}</td>
+                <td>
+                  <form class="danger" method="post" action="{{$.AdminPath}}/action"><input type="hidden" name="csrf"
+                      value="{{$.CSRF}}"><input type="hidden" name="action" value="delete_event"><input type="hidden"
+                      name="back" value="{{$.AdminPath}}/events"><input type="hidden" name="id" value="{{.ID}}"><button
+                      class="icon-button icon-delete">Delete</button></form>
+                </td>
+              </tr>
+              {{end}}
+            </table>
+          </section>
+          {{end}}
+        </div>
+      </section>
+
+      <aside class="side-rail">
+        <section class="stats">
+          <div class="stat"><span>Submissions</span><b>{{.Stats.Submissions}}</b></div>
+          <div class="stat"><span>Accounts</span><b>{{.Stats.Accounts}}</b></div>
+          <div class="stat"><span>Request logs</span><b>{{.Stats.Events}}</b></div>
+          <div class="stat"><span>Last upload</span><b class="last-submission">{{.Stats.LastSubmission}}</b></div>
+        </section>
+        <div class="bank-panel">
+          <b>Server Account:</b>
+          <span>CSRF: active</span>
+          <span>Session: signed</span>
+          <span>Storage: SQLite</span>
+        </div>
+      </aside>
+    </main>
+  </div>
+</body>
+
+</html>

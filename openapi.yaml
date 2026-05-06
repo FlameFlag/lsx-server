@@ -1,0 +1,227 @@
+openapi: 3.1.0
+info:
+  title: LSX Server API
+  version: 1.0.0
+  description: Read-only JSON API for Lemonade Stock Exchange leaderboard integrations.
+servers:
+  - url: http://127.0.0.1:8080
+paths:
+  /api/v1/leaderboard:
+    get:
+      operationId: listLeaderboardRows
+      summary: List leaderboard rows
+      description: Returns the live LSX leaderboard using the same ranking rules as the recovered HTML board.
+      parameters:
+        - $ref: "#/components/parameters/Page"
+        - $ref: "#/components/parameters/PageSize"
+        - $ref: "#/components/parameters/Sort"
+        - $ref: "#/components/parameters/Username"
+        - $ref: "#/components/parameters/GameMode"
+        - $ref: "#/components/parameters/GameGoal"
+      responses:
+        "200":
+          description: Leaderboard rows.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/LeaderboardResponse"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "405":
+          $ref: "#/components/responses/MethodNotAllowed"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+    head:
+      operationId: headLeaderboardRows
+      summary: Check leaderboard resource availability
+      responses:
+        "200":
+          description: Leaderboard resource is available.
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "405":
+          $ref: "#/components/responses/MethodNotAllowed"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+components:
+  parameters:
+    Page:
+      name: page
+      in: query
+      description: Positive page number. Values past the last page return the last page.
+      schema:
+        type: integer
+        minimum: 1
+        default: 1
+    PageSize:
+      name: page_size
+      in: query
+      description: Positive page size capped at 100.
+      schema:
+        type: integer
+        minimum: 1
+        maximum: 100
+        default: 10
+    Sort:
+      name: sort
+      in: query
+      description: Sort order for the leaderboard.
+      schema:
+        type: string
+        enum: [market, company, ceo, lifespan]
+        default: market
+    Username:
+      name: username
+      in: query
+      description: Case-insensitive exact username filter.
+      schema:
+        type: string
+    GameMode:
+      name: gamemode
+      in: query
+      description: Game mode filter matching recovered client values.
+      schema:
+        type: string
+    GameGoal:
+      name: gamegoal
+      in: query
+      description: Game goal filter matching recovered client values.
+      schema:
+        type: string
+  responses:
+    BadRequest:
+      description: Invalid query parameter.
+      content:
+        application/problem+json:
+          schema:
+            $ref: "#/components/schemas/Problem"
+    MethodNotAllowed:
+      description: Unsupported HTTP method.
+      headers:
+        Allow:
+          schema:
+            type: string
+          example: GET, HEAD
+      content:
+        application/problem+json:
+          schema:
+            $ref: "#/components/schemas/Problem"
+    InternalServerError:
+      description: Server failed to load leaderboard data.
+      content:
+        application/problem+json:
+          schema:
+            $ref: "#/components/schemas/Problem"
+  schemas:
+    LeaderboardResponse:
+      type: object
+      required: [data, pagination, filters, sort]
+      properties:
+        data:
+          type: array
+          items:
+            $ref: "#/components/schemas/LeaderboardRow"
+        pagination:
+          $ref: "#/components/schemas/Pagination"
+        filters:
+          $ref: "#/components/schemas/Filters"
+        sort:
+          type: string
+          enum: [market, company, ceo, lifespan]
+    LeaderboardRow:
+      type: object
+      required:
+        - rank
+        - company
+        - ceo
+        - mode
+        - goal
+        - title
+        - lifespan
+        - market_cents
+        - revenue_cents
+        - retained_cents
+        - stands
+        - cups_sold
+        - source
+        - checksum_valid
+      properties:
+        rank:
+          type: integer
+          minimum: 1
+        company:
+          type: string
+        ceo:
+          type: string
+        mode:
+          type: string
+        goal:
+          type: string
+        title:
+          type: string
+        lifespan:
+          type: integer
+          format: int64
+        market_cents:
+          type: integer
+          format: int64
+        revenue_cents:
+          type: integer
+          format: int64
+        retained_cents:
+          type: integer
+          format: int64
+        stands:
+          type: integer
+          format: int64
+        cups_sold:
+          type: integer
+          format: int64
+        username:
+          type: string
+        date_scalar:
+          type: string
+        source:
+          type: string
+        checksum_valid:
+          type: boolean
+    Pagination:
+      type: object
+      required: [page, page_size, total_items, total_pages]
+      properties:
+        page:
+          type: integer
+          minimum: 1
+        page_size:
+          type: integer
+          minimum: 1
+          maximum: 100
+        total_items:
+          type: integer
+          minimum: 0
+        total_pages:
+          type: integer
+          minimum: 1
+    Filters:
+      type: object
+      properties:
+        gamemode:
+          type: string
+        gamegoal:
+          type: string
+        username:
+          type: string
+    Problem:
+      type: object
+      required: [type, title, status]
+      properties:
+        type:
+          type: string
+          format: uri-reference
+          example: about:blank
+        title:
+          type: string
+        status:
+          type: integer
+        detail:
+          type: string

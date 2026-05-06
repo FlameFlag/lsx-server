@@ -1,0 +1,36 @@
+<!doctype html>
+<html>
+
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+    <title>Lemonade Tycoon 2 Stock Exchange</title>
+    <link rel="stylesheet" href="/lsx2.css">
+    <script>
+        function opentiframe() { return true; }
+    </script>
+</head>
+
+<body scroll="no" oncontextmenu="return false;">
+    <div class="wrap">
+        <div class="bar">Lemonade Stock Exchange<a class="fan-link" href="http://jamdat.ca/" target="_blank">This is a fan project. Visit jamdat.ca for more info.</a></div>
+        <table>
+            <tr>{{range .Headers}}<th class="{{.Class}}"><a href="{{.URL}}">{{.Label}}</a></th>{{end}}</tr>
+            {{if .Rows}}{{range .Rows}}<tr{{if .RowClass}} class="{{.RowClass}}"{{end}}>
+                <td class="rank">{{.Rank}}</td>
+                <td class="company"><a href="{{.DetailURL}}" target="bizdetail"
+                        onClick="opentiframe();">{{.Company}}</a></td>
+                <td class="ceo">{{.CEO}}</td>
+                <td class="life">{{.Lifespan}}</td>
+                <td class="money">${{.MarketCap}}</td>
+            </tr>
+            {{end}}{{else}}<tr>
+                <td colspan="5">No LSX submissions match this view.</td>
+            </tr>{{end}}
+        </table>
+        <div class="foot">{{if .HasPrev}}<a href="{{.PrevURL}}">Back</a> {{end}}Page {{.Page}} of {{.Pages}}{{if
+            .HasNext}} <a href="{{.NextURL}}">Next</a>{{end}}</div><iframe name="bizdetail"
+            src="lsx2_detail_blank.php"></iframe>
+    </div>
+</body>
+
+</html>
