@@ -58,7 +58,7 @@
             inherit version;
 
             src = inputs.self;
-            vendorHash = "sha256-1KjBacFMKNu3lLA3LC/NB7YmwB+eubnGrCqsYGDK34Q=";
+            vendorHash = "sha256-ErGUbIynpENr27Juu9gsMQI83cTLCbJ2Oadkhe3aKKA=";
 
             env.CGO_ENABLED = 0;
             subPackages = [ "." ];

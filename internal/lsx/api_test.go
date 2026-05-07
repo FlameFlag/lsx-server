@@ -1,13 +1,21 @@
 package lsx
 
 import (
+	"bytes"
+	"context"
 	"encoding/json"
+	"io"
 	"net/http"
 	"net/http/httptest"
 	"net/url"
 	"path/filepath"
 	"strings"
 	"testing"
+
+	"github.com/getkin/kin-openapi/openapi3"
+	"github.com/getkin/kin-openapi/openapi3filter"
+	"github.com/getkin/kin-openapi/routers"
+	"github.com/getkin/kin-openapi/routers/gorillamux"
 )
 
 func TestAPILeaderboardReturnsRankedJSON(t *testing.T) {
@@ -39,6 +47,7 @@ func TestAPILeaderboardReturnsRankedJSON(t *testing.T) {
 	if resp.Sort != "market" {
 		t.Fatalf("sort = %q, want market", resp.Sort)
 	}
+	validateOpenAPIExchange(t, http.MethodGet, "/api/v1/leaderboard", rr)
 }
 
 func TestAPILeaderboardFiltersSortsAndPaginates(t *testing.T) {
@@ -65,6 +74,7 @@ func TestAPILeaderboardFiltersSortsAndPaginates(t *testing.T) {
 	if len(resp.Data) != 1 || resp.Data[0].Company != "Beta Lemon" || resp.Data[0].Rank != 2 {
 		t.Fatalf("data = %+v, want second company-sorted ada row", resp.Data)
 	}
+	validateOpenAPIExchange(t, http.MethodGet, "/api/v1/leaderboard?username=ada&gamemode=1&sort=company&page=2&page_size=1", rr)
 }
 
 func TestAPILeaderboardRejectsBadQuery(t *testing.T) {
@@ -80,6 +90,7 @@ func TestAPILeaderboardRejectsBadQuery(t *testing.T) {
 	if !strings.Contains(rr.Body.String(), `"status":400`) || !strings.Contains(rr.Body.String(), "page_size") {
 		t.Fatalf("problem body missing expected details: %s", rr.Body.String())
 	}
+	validateOpenAPIErrorResponse(t, http.MethodGet, "/api/v1/leaderboard?page_size=500", rr)
 }
 
 func TestAPILeaderboardSupportsHead(t *testing.T) {
@@ -98,6 +109,7 @@ func TestAPILeaderboardSupportsHead(t *testing.T) {
 	if rr.Body.Len() != 0 {
 		t.Fatalf("HEAD body len = %d, want 0", rr.Body.Len())
 	}
+	validateOpenAPIExchange(t, http.MethodHead, "/api/v1/leaderboard", rr)
 }
 
 func TestAPILeaderboardRejectsUnsupportedMethod(t *testing.T) {
@@ -154,4 +166,76 @@ func insertAPISubmission(t *testing.T, srv *Server, username string, company str
 	if rr.Code != http.StatusOK || rr.Body.String() != "SUCCESS\n" {
 		t.Fatalf("insert submission status=%d body=%q", rr.Code, rr.Body.String())
 	}
+}
+
+func validateOpenAPIExchange(t *testing.T, method string, target string, rr *httptest.ResponseRecorder) {
+	t.Helper()
+	req, route, pathParams := openAPIRoute(t, method, target)
+	input := &openapi3filter.RequestValidationInput{
+		Request:    req,
+		PathParams: pathParams,
+		Route:      route,
+		Options: &openapi3filter.Options{
+			RejectWhenRequestBodyNotSpecified: true,
+		},
+	}
+	if err := openapi3filter.ValidateRequest(context.Background(), input); err != nil {
+		t.Fatalf("OpenAPI request validation failed for %s %s: %v", method, target, err)
+	}
+	validateOpenAPIResponse(t, input, method, target, rr)
+}
+
+func validateOpenAPIErrorResponse(t *testing.T, method string, target string, rr *httptest.ResponseRecorder) {
+	t.Helper()
+	req, route, pathParams := openAPIRoute(t, method, target)
+	input := &openapi3filter.RequestValidationInput{
+		Request:    req,
+		PathParams: pathParams,
+		Route:      route,
+	}
+	validateOpenAPIResponse(t, input, method, target, rr)
+}
+
+func validateOpenAPIResponse(t *testing.T, reqInput *openapi3filter.RequestValidationInput, method string, target string, rr *httptest.ResponseRecorder) {
+	t.Helper()
+	input := &openapi3filter.ResponseValidationInput{
+		RequestValidationInput: reqInput,
+		Status:                 rr.Code,
+		Header:                 rr.Result().Header,
+		Body:                   io.NopCloser(bytes.NewReader(rr.Body.Bytes())),
+		Options: &openapi3filter.Options{
+			IncludeResponseStatus: true,
+		},
+	}
+	if err := openapi3filter.ValidateResponse(context.Background(), input); err != nil {
+		t.Fatalf("OpenAPI response validation failed for %s %s: %v\nbody=%s", method, target, err, rr.Body.String())
+	}
+}
+
+func openAPIRoute(t *testing.T, method string, target string) (*http.Request, *routers.Route, map[string]string) {
+	t.Helper()
+	doc := openAPIDoc(t)
+	router, err := gorillamux.NewRouter(doc)
+	if err != nil {
+		t.Fatalf("build OpenAPI router: %v", err)
+	}
+	req := httptest.NewRequest(method, "http://127.0.0.1:8080"+target, nil)
+	route, pathParams, err := router.FindRoute(req)
+	if err != nil {
+		t.Fatalf("find OpenAPI route for %s %s: %v", method, target, err)
+	}
+	return req, route, pathParams
+}
+
+func openAPIDoc(t *testing.T) *openapi3.T {
+	t.Helper()
+	loader := openapi3.NewLoader()
+	doc, err := loader.LoadFromFile(filepath.Join("..", "..", "openapi.yaml"))
+	if err != nil {
+		t.Fatalf("load openapi.yaml: %v", err)
+	}
+	if err := doc.Validate(context.Background()); err != nil {
+		t.Fatalf("validate openapi.yaml: %v", err)
+	}
+	return doc
 }

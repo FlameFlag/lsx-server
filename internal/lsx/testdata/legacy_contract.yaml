@@ -1,0 +1,428 @@
+# Recovered from the unpacked Lemonade Tycoon 2 runtime:
+# - direct account/score transfer uses raw HTTP GET to gt.jamdat.ca:80
+# - the client accepts responses by substring token, not by structured payload
+# - the embedded browser checks connection.gif and then lands on /lsx2.php
+
+protocol:
+  account:
+    # Recovered direct client request.
+    method: GET
+    host: gt.jamdat.ca
+    request_headers:
+      Accept: text/plain
+    routes:
+      - /createaccount.php
+    required_query:
+      - username
+      - password
+    response_contains: ACCEPT
+
+  score_upload:
+    # Recovered direct client request.
+    method: GET
+    host: gt.jamdat.ca
+    request_headers:
+      Accept: text/plain
+    routes:
+      - /syncgame.php
+    required_query: &sync_required_query
+      - game
+      - username
+      - password
+      - companyname
+      - ceoname
+      - gamemode
+      - gamegoal
+      - gamestartingdate
+      - lifespan
+      - stands
+      - cupssold
+      - cashassets
+      - stockassets
+      - standsassets
+      - upgradesassets
+      - retainedearnings
+      - revenues
+      - checksumclient
+    response_contains: SUCCESS
+
+  strict_score_upload_rejection:
+    # Server policy extension: useful for diagnostics, not original LSX behavior.
+    method: GET
+    host: gt.jamdat.ca
+    request_headers:
+      Accept: text/plain
+    routes:
+      - /syncgame.php
+    required_query: *sync_required_query
+    response_contains: FAIL
+
+  browser_check:
+    # Recovered embedded browser availability probe.
+    method: GET
+    host: gt.jamdat.ca
+    routes:
+      - /img/lsx2/connection.gif
+    response_content_type: image/gif
+
+  browser_landing:
+    # Recovered embedded browser landing page after connection.gif succeeds.
+    method: GET
+    host: gt.jamdat.ca
+    routes:
+      - /lsx2.php
+    response_contains: Lemonade Stock Exchange
+    response_content_type: text/html
+
+  detail_panel:
+    # Recovered iframe panel opened from LSX board row links.
+    method: GET
+    routes:
+      - /lsx2_detail.php
+    response_contains: Upgrade Assets
+    response_content_type: text/html
+
+  blank_detail_panel:
+    # Recovered initial iframe document before a row is selected.
+    method: GET
+    routes:
+      - /lsx2_detail_blank.php
+    response_contains: "#DEFFA5"
+    response_content_type: text/html
+
+  server_account_alias:
+    # Server compatibility extension; the recovered binary used /createaccount.php.
+    method: GET
+    routes:
+      - /createaccount
+    required_query:
+      - username
+      - password
+    response_contains: ACCEPT
+
+  server_score_upload_alias:
+    # Server compatibility extension; the recovered binary used /syncgame.php.
+    method: GET
+    routes:
+      - /syncgame
+    required_query: *sync_required_query
+    response_contains: SUCCESS
+
+setup:
+  - name: seed leaderboard row
+    contract: score_upload
+    request:
+      path: /syncgame.php
+      query:
+        game: lemonade2
+        username: fixture
+        password: p
+        companyname: FixtureCo
+        ceoname: CEO
+        gamemode: "1"
+        gamegoal: "1"
+        gamestartingdate: "1"
+        lifespan: "3"
+        stands: "1"
+        cupssold: "6"
+        cashassets: "1000"
+        stockassets: "0"
+        standsassets: "500"
+        upgradesassets: "900"
+        retainedearnings: "0"
+        revenues: "500"
+        checksumclient: "2606"
+    response:
+      status: 200
+      body: "SUCCESS\n"
+
+examples:
+  - name: account probe returns accepted token
+    contract: account
+    request:
+      path: /createaccount.php
+      query:
+        username: u
+        password: p
+    response:
+      status: 200
+      body: "ACCEPT\n"
+
+  - name: score upload returns success token
+    contract: score_upload
+    request:
+      path: /syncgame.php
+      query:
+        game: lemonade2
+        username: u
+        password: p
+        companyname: Co
+        ceoname: CEO
+        gamemode: "7"
+        gamegoal: "4"
+        gamestartingdate: "2"
+        lifespan: "3"
+        stands: "1"
+        cupssold: "6"
+        cashassets: "10"
+        stockassets: "0"
+        standsassets: "5"
+        upgradesassets: "9"
+        retainedearnings: "8"
+        revenues: "500"
+        checksumclient: "2485"
+    response:
+      status: 200
+      body: "SUCCESS\n"
+
+  - name: default checksum mode accepts mismatches
+    contract: score_upload
+    request:
+      path: /syncgame.php
+      query:
+        game: lemonade2
+        username: u
+        password: p
+        companyname: Co
+        ceoname: CEO
+        gamemode: "0"
+        gamegoal: "0"
+        gamestartingdate: "0"
+        lifespan: "1"
+        stands: "1"
+        cupssold: "0"
+        cashassets: "49000"
+        stockassets: "0"
+        standsassets: "3000"
+        upgradesassets: "0"
+        retainedearnings: "0"
+        revenues: "0"
+        checksumclient: "0"
+    response:
+      status: 200
+      body: "SUCCESS\n"
+
+  - name: strict checksum mode rejects mismatches
+    strict_checksum: true
+    contract: strict_score_upload_rejection
+    request:
+      path: /syncgame.php
+      query:
+        game: lemonade2
+        username: u
+        password: p
+        companyname: Co
+        ceoname: CEO
+        gamemode: "0"
+        gamegoal: "0"
+        gamestartingdate: "0"
+        lifespan: "1"
+        stands: "1"
+        cupssold: "0"
+        cashassets: "49000"
+        stockassets: "0"
+        standsassets: "3000"
+        upgradesassets: "0"
+        retainedearnings: "0"
+        revenues: "0"
+        checksumclient: "0"
+    response:
+      status: 200
+      body: "FAIL\n"
+
+  - name: connection gif is available for browser check
+    contract: browser_check
+    request:
+      path: /img/lsx2/connection.gif
+    response:
+      status: 200
+      content_type: image/gif
+      body_nonempty: true
+
+  - name: old client receives legacy board
+    contract: browser_landing
+    request:
+      path: /lsx2.php
+      headers:
+        User-Agent: Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1)
+    response:
+      status: 200
+      content_type: text/html
+      contains:
+        - Lemonade Stock Exchange
+        - FixtureCo
+      not_contains:
+        - Open LSX Board
+
+  - name: browser landing accepts username query
+    contract: browser_landing
+    request:
+      path: /lsx2.php
+      query:
+        username: fixture
+      headers:
+        User-Agent: Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1)
+    response:
+      status: 200
+      content_type: text/html
+      contains:
+        - Lemonade Stock Exchange
+        - FixtureCo
+
+  - name: detail panel renders recovered d-fields
+    contract: detail_panel
+    request:
+      path: /lsx2_detail.php
+      query:
+        d1: GoalTwo
+        d2: Boss
+        d5: "1"
+        d18: "25.00"
+    response:
+      status: 200
+      content_type: text/html
+      contains:
+        - GoalTwo
+        - Boss
+        - Upgrade Assets
+
+  - name: blank detail panel keeps recovered background color
+    contract: blank_detail_panel
+    request:
+      path: /lsx2_detail_blank.php
+    response:
+      status: 200
+      content_type: text/html
+      contains:
+        - "#DEFFA5"
+
+  - name: account alias remains available as server compatibility
+    contract: server_account_alias
+    request:
+      path: /createaccount
+      query:
+        username: u
+        password: p
+    response:
+      status: 200
+      body: "ACCEPT\n"
+
+  - name: score upload alias remains available as server compatibility
+    contract: server_score_upload_alias
+    request:
+      path: /syncgame
+      query:
+        game: lemonade2
+        username: alias
+        password: p
+        companyname: AliasCo
+        ceoname: CEO
+        gamemode: "1"
+        gamegoal: "1"
+        gamestartingdate: "1"
+        lifespan: "3"
+        stands: "1"
+        cupssold: "6"
+        cashassets: "1000"
+        stockassets: "0"
+        standsassets: "500"
+        upgradesassets: "900"
+        retainedearnings: "0"
+        revenues: "500"
+        checksumclient: "2606"
+    response:
+      status: 200
+      body: "SUCCESS\n"
+
+  - name: modern browser receives project page
+    request:
+      path: /lsx2.php
+      headers:
+        User-Agent: Mozilla/5.0 AppleWebKit/537.36 Chrome/124.0.0.0 Safari/537.36
+    response:
+      status: 200
+      contains:
+        - Open LSX Board
+        - FixtureCo
+      not_contains:
+        - href="/lsx2.css"
+        - /admin
+
+  - name: legacy override forces old board for modern browsers
+    request:
+      path: /lsx2.php
+      query:
+        legacy: "1"
+      headers:
+        User-Agent: Mozilla/5.0 AppleWebKit/537.36 Chrome/124.0.0.0 Safari/537.36
+    response:
+      status: 200
+      contains:
+        - Lemonade Stock Exchange
+
+  - name: board route stays legacy for all browsers
+    request:
+      path: /board
+      headers:
+        User-Agent: Mozilla/5.0 AppleWebKit/537.36 Chrome/124.0.0.0 Safari/537.36
+    response:
+      status: 200
+      contains:
+        - Lemonade Stock Exchange
+
+  - name: embedded IE document fallback serves board
+    request:
+      path: /findings
+      headers:
+        User-Agent: Mozilla/4.0 (compatible; MSIE 7.0; Windows NT 5.1; Trident/4.0)
+    response:
+      status: 200
+      contains:
+        - Lemonade Stock Exchange
+      not_contains:
+        - id="findings-blog-root"
+
+  - name: embedded IE text requests do not fallback
+    request:
+      path: /unknown-protocol-call
+      headers:
+        User-Agent: Mozilla/4.0 (compatible; MSIE 7.0; Windows NT 5.1; Trident/4.0)
+        Accept: text/plain
+    response:
+      status: 404
+      not_contains:
+        - <table>
+
+  - name: findings page renders modern article
+    request:
+      path: /findings
+    response:
+      status: 200
+      contains:
+        - id="findings-blog-root"
+        - Lemonade2.rb is a resource container
+        - Decode one bitmap record
+      not_contains:
+        - /admin
+
+  - name: docs page renders OpenAPI shell
+    request:
+      path: /docs
+    response:
+      status: 200
+      contains:
+        - id="openapi-docs-root"
+        - /openapi.yaml
+        - LSX Server API
+      not_contains:
+        - /admin
+
+  - name: OpenAPI yaml is served
+    request:
+      path: /openapi.yaml
+    response:
+      status: 200
+      content_type: application/yaml
+      contains:
+        - "openapi: 3.1.0"
+        - /api/v1/leaderboard
