@@ -299,11 +299,24 @@ func writeText(w http.ResponseWriter, code int, body string) {
 }
 
 func remoteIP(r *http.Request) string {
+	if forwarded := forwardedForIP(r.Header.Get("X-Forwarded-For")); forwarded != "" {
+		return forwarded
+	}
 	host, _, err := net.SplitHostPort(r.RemoteAddr)
 	if err != nil {
 		return r.RemoteAddr
 	}
 	return host
+}
+
+func forwardedForIP(header string) string {
+	for part := range strings.SplitSeq(header, ",") {
+		ip := strings.TrimSpace(part)
+		if ip != "" {
+			return ip
+		}
+	}
+	return ""
 }
 
 func LogRequests(next http.Handler) http.Handler {
