@@ -1,0 +1,66 @@
+@layer components {
+  .findings-root {
+    @apply text-lsx-ink;
+  }
+
+  .findings-root h2 {
+    @apply mt-8 font-display text-3xl text-lsx-ink;
+  }
+
+  .findings-root h3 {
+    @apply mt-5 font-display text-2xl text-lsx-ink;
+  }
+
+  .findings-root p {
+    @apply mt-3 leading-7;
+  }
+
+  .findings-root a {
+    @apply font-black underline decoration-[#9db65d] underline-offset-4;
+  }
+
+  .findings-root code:not(.hljs) {
+    @apply rounded bg-[#eef6bd] px-1 py-0.5 font-mono text-sm;
+  }
+
+  .findings-hero {
+    @apply rounded-lg border-2 border-lsx-field bg-lsx-cream p-4;
+  }
+
+  .findings-kicker,
+  .findings-updated {
+    @apply font-black text-[#5f7b2e];
+  }
+
+  .findings-nav {
+    @apply my-5 grid gap-2 rounded-lg border-2 border-lsx-border bg-[#eef6bd] p-3 md:grid-cols-2 xl:grid-cols-3;
+  }
+
+  .findings-nav a {
+    @apply rounded-md bg-white px-3 py-2 text-sm no-underline hover:bg-[#fff8b9];
+  }
+
+  .findings-root table {
+    @apply mt-4 w-full min-w-170 border-collapse bg-white text-sm;
+  }
+
+  .findings-root table {
+    @apply mt-4 overflow-x-auto rounded-lg border-2 border-lsx-border;
+  }
+
+  .findings-root th {
+    @apply bg-lsx-leaf px-3 py-2 text-left text-white;
+  }
+
+  .findings-root td {
+    @apply border-t border-[#cbdc8a] px-3 py-2 align-top;
+  }
+
+  .findings-code {
+    @apply mt-4 overflow-x-auto rounded-lg border-2 border-lsx-border bg-[#f6f8fa] p-0 font-mono text-sm;
+  }
+
+  .findings-code code {
+    @apply block bg-transparent p-4;
+  }
+}

@@ -22,10 +22,6 @@ func TestStylesheetRoutes(t *testing.T) {
 	tests := []string{
 		"/lsx2.css",
 		"/lsx2_detail.css",
-		"/admin/asset/admin.css",
-		"/admin/asset/login.css",
-		"/admin/asset/dashboard/foundation.css",
-		"/admin/asset/login/foundation.css",
 	}
 	for _, path := range tests {
 		req := httptest.NewRequest(http.MethodGet, path, nil)
@@ -45,14 +41,6 @@ func TestStylesheetRoutes(t *testing.T) {
 			}
 			if strings.Contains(body, ":nth-child") {
 				t.Fatalf("%s legacy stylesheet contains a modern selector", path)
-			}
-		case strings.HasSuffix(path, "admin.css"):
-			if !strings.Contains(body, `@import url("dashboard/foundation.css");`) {
-				t.Fatalf("%s stylesheet body did not include expected imports", path)
-			}
-		case strings.HasSuffix(path, "login.css"):
-			if !strings.Contains(body, `@import url("login/foundation.css");`) {
-				t.Fatalf("%s stylesheet body did not include expected imports", path)
 			}
 		default:
 			if !strings.Contains(body, "body") {
@@ -74,10 +62,6 @@ func TestImageAssetRoutes(t *testing.T) {
 	defer func() { _ = srv.Close() }()
 
 	tests := []string{
-		"/admin/asset/upload_icon.avif",
-		"/admin/asset/pitcher.avif",
-		"/admin/asset/warning.avif",
-		"/admin/asset/lt2_green_pill.avif",
 		"/project/asset/lt2_asset_credits.avif",
 		"/project/asset/lt2_asset_github.avif",
 		"/project/asset/lt2_green_pill.avif",
@@ -88,6 +72,7 @@ func TestImageAssetRoutes(t *testing.T) {
 		"/project/asset/lt2_logo_text_only.avif",
 		"/project/asset/menu_map_backdrop.avif",
 		"/project/asset/pitcher.avif",
+		"/project/asset/warning.avif",
 	}
 	for _, path := range tests {
 		req := httptest.NewRequest(http.MethodGet, path, nil)
@@ -134,43 +119,6 @@ func TestPNGImageAssetRoutes(t *testing.T) {
 	}
 }
 
-func TestProjectFontAssetRoutes(t *testing.T) {
-	srv, err := NewServer(Config{
-		DBPath: filepath.Join(t.TempDir(), "lsx.sqlite3"),
-	})
-	if err != nil {
-		t.Fatal(err)
-	}
-	defer func() { _ = srv.Close() }()
-
-	tests := []string{
-		"/project/asset/fonts/NotoSans-Bold.ttf",
-		"/project/asset/fonts/NotoSans-Bold.woff2",
-		"/project/asset/fonts/RobotoCondensed-Bold.ttf",
-		"/project/asset/fonts/RobotoCondensed-Bold.woff2",
-	}
-	for _, path := range tests {
-		req := httptest.NewRequest(http.MethodGet, path, nil)
-		rr := httptest.NewRecorder()
-		srv.Routes().ServeHTTP(rr, req)
-		if rr.Code != http.StatusOK {
-			t.Fatalf("%s status = %d, want 200", path, rr.Code)
-		}
-		wantType := "font/ttf"
-		wantHeader := "\x00\x01\x00\x00"
-		if strings.HasSuffix(path, ".woff2") {
-			wantType = "font/woff2"
-			wantHeader = "wOF2"
-		}
-		if got := rr.Header().Get("Content-Type"); got != wantType {
-			t.Fatalf("%s content-type = %q, want %s", path, got, wantType)
-		}
-		if !strings.HasPrefix(rr.Body.String(), wantHeader) {
-			t.Fatalf("%s body did not start with expected font header", path)
-		}
-	}
-}
-
 func TestPNGProjectAssetRoutesAreGoneForModernBrowsers(t *testing.T) {
 	srv, err := NewServer(Config{
 		DBPath: filepath.Join(t.TempDir(), "lsx.sqlite3"),
@@ -204,25 +152,50 @@ func TestProjectScriptAssetRoute(t *testing.T) {
 	}
 	defer func() { _ = srv.Close() }()
 
-	tests := map[string]string{
-		"/project/asset/docs/entry.js":     "openapi-docs-root",
-		"/project/asset/findings/code.js":  "export const highlightCodeBlocks",
-		"/project/asset/findings/entry.js": "highlightCodeBlocks",
+	pageReq := httptest.NewRequest(http.MethodGet, "/findings", nil)
+	pageReq.Header.Set("User-Agent", "Mozilla/5.0 AppleWebKit/537.36 Chrome/124.0.0.0 Safari/537.36")
+	pageRR := httptest.NewRecorder()
+	srv.Routes().ServeHTTP(pageRR, pageReq)
+	if pageRR.Code != http.StatusOK {
+		t.Fatalf("/findings status = %d, want 200", pageRR.Code)
 	}
-	for path, want := range tests {
+	body := pageRR.Body.String()
+	if !strings.Contains(body, `data-page="findings"`) ||
+		!strings.Contains(body, `/project/asset/svelte/`) {
+		t.Fatalf("/findings did not render the Svelte app shell:\n%s", body)
+	}
+
+	assetPaths := svelteAssetPaths(body)
+	if len(assetPaths) == 0 {
+		t.Fatalf("/findings did not include Svelte asset paths:\n%s", body)
+	}
+	for _, path := range assetPaths {
 		req := httptest.NewRequest(http.MethodGet, path, nil)
 		rr := httptest.NewRecorder()
 		srv.Routes().ServeHTTP(rr, req)
 		if rr.Code != http.StatusOK {
 			t.Fatalf("%s status = %d, want 200", path, rr.Code)
 		}
-		if got := rr.Header().Get("Content-Type"); !strings.HasPrefix(got, "text/javascript") {
-			t.Fatalf("%s content-type = %q, want text/javascript", path, got)
+		contentType := rr.Header().Get("Content-Type")
+		if strings.HasSuffix(path, ".js") && !strings.HasPrefix(contentType, "text/javascript") {
+			t.Fatalf("%s content-type = %q, want text/javascript", path, contentType)
 		}
-		if !strings.Contains(rr.Body.String(), want) {
-			t.Fatalf("%s body did not include %q", path, want)
+		if strings.HasSuffix(path, ".css") && !strings.HasPrefix(contentType, "text/css") {
+			t.Fatalf("%s content-type = %q, want text/css", path, contentType)
 		}
 	}
+}
+
+func svelteAssetPaths(body string) []string {
+	var paths []string
+	for _, token := range strings.FieldsFunc(body, func(r rune) bool {
+		return r == '"' || r == '\''
+	}) {
+		if strings.HasPrefix(token, "/project/asset/svelte/") {
+			paths = append(paths, token)
+		}
+	}
+	return paths
 }
 
 func TestGeneratedFindingsContentIsNotServedAsAnAsset(t *testing.T) {

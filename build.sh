@@ -162,8 +162,11 @@ if [[ -z ${OUT:-} ]]; then
   OUT="dist/${APP_NAME}_${TARGET_OS}_${TARGET_ARCH}${suffix}"
 fi
 
-printf 'Generating embedded browser assets...\n'
-GOOS=$HOST_OS GOARCH=$HOST_ARCH go generate ./assets
+printf 'Building Svelte browser assets...\n'
+command -v npm >/dev/null ||
+  die "npm is required to build browser assets"
+npm --prefix web ci
+npm --prefix web run build
 
 if [[ $RUN_TESTS == 1 ]]; then
   if [[ $RUN_CHECKS == 1 ]]; then
@@ -201,6 +204,7 @@ printf 'Building optimized %s binary: %s\n' "$TARGET" "$OUT"
 mkdir -p "$(dirname -- "$OUT")"
 GOOS=$TARGET_OS GOARCH=$TARGET_ARCH go build \
   -trimpath \
+  -tags webdist \
   -ldflags "-s -w -X main.version=$VERSION" \
   -o "$OUT" \
   .

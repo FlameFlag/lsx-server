@@ -17,8 +17,6 @@ func serveWebAsset(w http.ResponseWriter, r *http.Request, name, contentType str
 
 func assetContentType(name string) string {
 	switch {
-	case strings.HasPrefix(name, "findings/vendor/shiki/"):
-		return "text/javascript; charset=utf-8"
 	case strings.HasSuffix(name, ".js") || strings.HasSuffix(name, ".mjs"):
 		return "text/javascript; charset=utf-8"
 	case strings.HasSuffix(name, ".json"):
@@ -31,6 +29,8 @@ func assetContentType(name string) string {
 		return "text/css; charset=utf-8"
 	case strings.HasSuffix(name, ".ttf"):
 		return "font/ttf"
+	case strings.HasSuffix(name, ".woff"):
+		return "font/woff"
 	case strings.HasSuffix(name, ".woff2"):
 		return "font/woff2"
 	default:

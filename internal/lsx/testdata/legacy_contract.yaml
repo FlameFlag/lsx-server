@@ -342,8 +342,9 @@ examples:
     response:
       status: 200
       contains:
-        - Open LSX Board
+        - data-page="home"
         - FixtureCo
+        - /project/asset/svelte/
       not_contains:
         - href="/lsx2.css"
         - /admin
@@ -399,9 +400,9 @@ examples:
     response:
       status: 200
       contains:
-        - id="findings-blog-root"
+        - data-page="findings"
         - Lemonade2.rb is a resource container
-        - Decode one bitmap record
+        - /project/asset/svelte/
       not_contains:
         - /admin
 
@@ -411,9 +412,9 @@ examples:
     response:
       status: 200
       contains:
-        - id="openapi-docs-root"
-        - /openapi.yaml
-        - LSX Server API
+        - data-page="docs"
+        - LSX API Documentation
+        - /project/asset/svelte/
       not_contains:
         - /admin
 

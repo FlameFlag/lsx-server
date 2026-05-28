@@ -1,7 +1,7 @@
 {
   description = "Lemonade Tycoon 2 LSX compatibility server";
 
-  inputs.nixpkgs.url = "github:NixOS/nixpkgs/master";
+  inputs.nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
 
   outputs =
     inputs:
@@ -13,7 +13,7 @@
         "x86_64-linux"
       ];
 
-      forAllSystems = inputs.nixpkgs.lib.genAttrs systems;
+      forAllSystems = inputs.nixpkgs.lib.attrsets.genAttrs systems;
     in
     {
       packages = forAllSystems (
@@ -21,36 +21,6 @@
         let
           pkgs = import inputs.nixpkgs { inherit system; };
           version = inputs.self.shortRev or inputs.self.dirtyShortRev or "dev";
-
-          shikiVendor = pkgs.stdenvNoCC.mkDerivation {
-            pname = "lsx-server-shiki-vendor";
-            inherit version;
-
-            nativeBuildInputs = [
-              pkgs.cacert
-              pkgs.go_1_26
-            ];
-
-            outputHashAlgo = "sha256";
-            outputHashMode = "recursive";
-            outputHash = "sha256-O8uzZQdwoYAV8U4aZz/qFezDEiVQKurbj/P7A74+QMA=";
-
-            dontUnpack = true;
-
-            buildPhase = ''
-              export HOME="$TMPDIR"
-              export GOCACHE="$TMPDIR/go-cache"
-              mkdir -p assets tools
-              cp ${./tools/download_findings_shiki.go} tools/download_findings_shiki.go
-              cd assets
-              go run ../tools/download_findings_shiki.go
-            '';
-
-            installPhase = ''
-              mkdir -p "$out"
-              cp -R project/findings/vendor/shiki/unpkg "$out/"
-            '';
-          };
         in
         {
           default = pkgs.buildGo126Module {
@@ -58,21 +28,24 @@
             inherit version;
 
             src = inputs.self;
-            vendorHash = "sha256-ErGUbIynpENr27Juu9gsMQI83cTLCbJ2Oadkhe3aKKA=";
+            vendorHash = "sha256-IjreT9GBKIabo2hcnVPN/5HMSDr4ieOHNWGaUWB4KXY=";
 
             env.CGO_ENABLED = 0;
             subPackages = [ "." ];
-
-            postConfigure = ''
-              mkdir -p assets/project/findings/vendor/shiki
-              cp -R ${shikiVendor}/unpkg assets/project/findings/vendor/shiki/
-            '';
 
             ldflags = [
               "-s"
               "-w"
               "-X main.version=${version}"
             ];
+
+            postInstall = ''
+              if [ -x "$out/bin/lsx_server_go" ] && [ ! -e "$out/bin/lsx-server" ]; then
+                mv "$out/bin/lsx_server_go" "$out/bin/lsx-server"
+              fi
+            '';
+
+            meta.mainProgram = "lsx-server";
           };
         }
       );
@@ -118,5 +91,34 @@
           };
         }
       );
+
+      nixosModules =
+        let
+          lsx-server = import ./nix/modules/nixos.nix { defaultPackage = inputs.self.packages; };
+        in
+        {
+          inherit lsx-server;
+          default = lsx-server;
+        };
+
+      homeManagerModules =
+        let
+          lsx-server = import ./nix/modules/home-manager.nix { defaultPackage = inputs.self.packages; };
+        in
+        {
+          inherit lsx-server;
+          default = lsx-server;
+        };
+
+      homeModules = inputs.self.homeManagerModules;
+
+      darwinModules =
+        let
+          lsx-server = import ./nix/modules/nix-darwin.nix { defaultPackage = inputs.self.packages; };
+        in
+        {
+          inherit lsx-server;
+          default = lsx-server;
+        };
     };
 }

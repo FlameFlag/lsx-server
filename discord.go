@@ -8,7 +8,7 @@ import (
 
 const embeddedDiscordIconName = "upload_icon.avif"
 
-//go:embed assets/admin/upload_icon.avif
+//go:embed web/static/admin/upload_icon.avif
 var embeddedDiscordIcon []byte
 
 func newDiscordNotifier(opts serveOptions) *discord.Notifier {

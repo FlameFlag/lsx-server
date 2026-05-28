@@ -1,0 +1,58 @@
+@layer components {
+  .login-screen,
+  .admin-screen {
+    @apply bg-[#254d1f];
+  }
+
+  .login-screen .screen-wash,
+  .admin-screen .screen-wash {
+    background:
+      linear-gradient(180deg, rgba(255, 255, 255, 0.22), rgba(200, 245, 105, 0.13) 42%, rgba(32, 92, 32, 0.34)),
+      linear-gradient(90deg, rgba(14, 52, 20, 0.32), rgba(255, 255, 255, 0.05) 48%, rgba(12, 45, 19, 0.34));
+  }
+
+  .login-screen {
+    @apply p-4;
+  }
+
+  .login-panel {
+    @apply relative z-10 w-full max-w-140;
+  }
+
+  .login-brand-header {
+    @apply relative mx-auto h-32 rounded-[34px] border-2 border-lt2-glow bg-[#d9ff9f]/88 shadow-[inset_0_2px_0_rgba(255,255,255,.82),0_10px_14px_rgba(30,86,23,.35)];
+    background-image:
+      linear-gradient(180deg, rgba(255, 255, 255, 0.58), rgba(189, 238, 91, 0.5)),
+      repeating-linear-gradient(0deg, rgba(255, 255, 255, 0.22) 0 12px, rgba(118, 206, 38, 0.16) 12px 24px);
+  }
+
+  .login-brand-header img {
+    @apply absolute left-1/2 -top-5.5 w-70 -translate-x-1/2;
+  }
+
+  .login-card {
+    @apply -mt-5 rounded-3xl border-2 border-white bg-lt2-panel/82 p-6 pt-10 shadow-lt2-panel;
+    background-image: repeating-linear-gradient(
+      0deg,
+      rgba(255, 255, 255, 0.22) 0 13px,
+      rgba(157, 223, 62, 0.1) 13px 26px
+    );
+  }
+
+  .login-lockup {
+    @apply border-b-2 border-[#b6dc65];
+  }
+
+  .login-lockup img {
+    @apply h-16 w-16;
+  }
+
+  .login-card h1 {
+    @apply font-display text-[34px] leading-none text-[#3d731f];
+    text-shadow: 0 1px 0 rgba(255, 255, 255, 0.72);
+  }
+
+  .login-subtitle {
+    @apply text-[#47702a];
+  }
+}

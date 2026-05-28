@@ -1,0 +1,45 @@
+@layer components {
+  .docs-actions,
+  .event-summary {
+    @apply flex flex-wrap gap-2;
+  }
+
+  .docs-title {
+    @apply font-display text-4xl text-lsx-ink;
+  }
+
+  .docs-copy {
+    @apply mt-2 max-w-2xl text-sm font-semibold text-lsx-muted;
+  }
+
+  .redoc-panel {
+    @apply mt-5 min-h-160 overflow-hidden rounded-lg border-2 border-lsx-border bg-white;
+  }
+
+  .status-message {
+    @apply mt-5 rounded-md bg-[#eef6bd] p-4 font-bold;
+  }
+
+  .status-message.error {
+    @apply bg-lsx-warn;
+  }
+
+  .summary-grid {
+    @apply mt-5 grid gap-3 sm:grid-cols-3;
+  }
+
+  .docs-stat,
+  .admin-stat {
+    @apply rounded-lg border-2 border-lsx-field bg-[#eef6bd] p-4;
+  }
+
+  .docs-stat dt,
+  .admin-stat dt {
+    @apply text-xs font-black uppercase text-[#6f7d2f];
+  }
+
+  .docs-stat dd,
+  .admin-stat dd {
+    @apply mt-1 text-2xl font-black;
+  }
+}

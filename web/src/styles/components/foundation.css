@@ -1,0 +1,87 @@
+@layer components {
+  .project-screen,
+  .admin-screen,
+  .login-screen {
+    @apply relative min-h-screen overflow-hidden bg-[#7fc7dc] text-lsx-ink;
+  }
+
+  .login-screen {
+    @apply grid place-items-center p-4;
+  }
+
+  .admin-screen {
+    @apply p-3 sm:p-5;
+  }
+
+  .screen-map {
+    @apply absolute inset-0 z-0 bg-cover bg-center opacity-85;
+    background-image: var(--lsx-menu-map-backdrop);
+  }
+
+  .screen-wash {
+    @apply absolute inset-0 z-0 bg-[linear-gradient(180deg,rgba(255,255,255,.68),rgba(239,249,203,.78)_42%,rgba(84,132,83,.62))];
+  }
+
+  .login-screen .screen-wash {
+    @apply bg-[linear-gradient(135deg,rgba(255,255,255,.72),rgba(238,248,188,.82)_50%,rgba(111,151,87,.72))];
+  }
+
+  .project-shell,
+  .admin-shell {
+    @apply relative z-10 mx-auto grid w-full max-w-7xl gap-4 px-3 py-3 sm:px-5 lg:px-8;
+  }
+
+  .project-shell {
+    @apply flex min-h-screen flex-col;
+  }
+
+  .brand-header {
+    @apply flex flex-col gap-3 rounded-lg border-2 border-[#376440] bg-lsx-cream/90 p-3 shadow-[0_8px_0_rgba(36,79,46,.35)] md:flex-row md:items-center md:justify-between;
+  }
+
+  .brand-logo {
+    @apply h-auto w-[min(360px,80vw)];
+  }
+
+  .project-nav {
+    @apply grid grid-cols-4 gap-2 md:w-auto;
+  }
+
+  .admin-nav {
+    @apply grid gap-2 sm:grid-cols-4;
+  }
+
+  .project-tab {
+    @apply grid min-h-20 place-items-center rounded-md border-2 border-lsx-border bg-lsx-paper px-2 py-2 text-center text-xs font-black uppercase text-lsx-ink shadow-[0_4px_0_rgba(35,70,34,.26)] transition hover:-translate-y-0.5 hover:bg-[#fff8b9] sm:text-sm;
+  }
+
+  .project-tab img,
+  .project-tab > span:last-child:not(:first-child) {
+    @apply mt-1 h-11 w-11 object-contain;
+  }
+
+  .help-badge {
+    @apply grid h-11 w-11 place-items-center rounded-md bg-[#314b85] text-lg font-black text-white;
+  }
+
+  .active-tab {
+    @apply bg-lsx-highlight text-[#193815] shadow-[0_2px_0_rgba(35,70,34,.4)];
+  }
+
+  .project-panel,
+  .admin-panel {
+    @apply rounded-lg border-2 border-[#3b6337] bg-lsx-panel/92 shadow-[0_10px_0_rgba(35,70,34,.32)];
+  }
+
+  .project-panel {
+    @apply mt-5 flex min-h-0 flex-1 flex-col;
+  }
+
+  .panel-title {
+    @apply border-b-2 border-[#6f984d] bg-lsx-leaf px-4 py-3 font-display text-3xl text-white sm:text-4xl;
+  }
+
+  .panel-body {
+    @apply min-h-0 flex-1 p-3 sm:p-5;
+  }
+}

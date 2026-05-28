@@ -135,10 +135,12 @@ $cgoEnabled = if ([string]::IsNullOrWhiteSpace($env:CGO_ENABLED)) { '0' } else {
 $hostOS = Get-GoEnv 'GOHOSTOS'
 $hostArch = Get-GoEnv 'GOHOSTARCH'
 
-Write-Information 'Generating embedded browser assets...'
-$env:GOOS = $hostOS
-$env:GOARCH = $hostArch
-Invoke-Native go @('generate', './assets')
+Write-Information 'Building Svelte browser assets...'
+if (-not (Test-Command 'npm')) {
+    throw 'npm is required to build browser assets'
+}
+Invoke-Native npm @('--prefix', 'web', 'ci')
+Invoke-Native npm @('--prefix', 'web', 'run', 'build')
 
 if (-not $SkipTests) {
     if (-not $SkipChecks) {
@@ -197,6 +199,7 @@ if (-not [string]::IsNullOrWhiteSpace($outDir)) {
 $buildArgs = @(
     'build',
     '-trimpath',
+    '-tags', 'webdist',
     '-ldflags', "-s -w -X main.version=$Version",
     '-o', $Out,
     '.'

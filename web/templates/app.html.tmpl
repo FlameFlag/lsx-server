@@ -1,0 +1,17 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{{.Title}}</title>
+  {{range .Styles}}<link rel="stylesheet" href="{{.}}">{{end}}
+</head>
+
+<body{{if .BodyClass}} class="{{.BodyClass}}"{{end}}>
+  <div id="app" data-page="{{.Page}}"></div>
+  <script id="lsx-page-data" type="application/json">{{.DataJSON}}</script>
+  {{range .Scripts}}<script type="module" src="{{.}}"></script>{{end}}
+</body>
+
+</html>

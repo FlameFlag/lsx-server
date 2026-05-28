@@ -1,6 +1,7 @@
 # Nix
 result/
 result-*
+result
 
 # OS metadata
 .DS_Store
@@ -41,11 +42,12 @@ $RECYCLE.BIN/
 tmp/
 temp/
 .cache/
+.fallow/
 
 # Go build and test output
 bin/
 build/
-dist/
+/dist/
 *.test
 *.out
 coverage.out
@@ -80,6 +82,9 @@ data/
 *.csv
 *.tsv
 
-# Generated browser vendor assets embedded into local release binaries
-assets/project/findings/vendor/shiki/*
-!assets/project/findings/vendor/shiki/README.md
+# Frontend dependencies and local tool caches
+node_modules/
+web/node_modules/
+web/dist/
+web/.vite/
+web/.svelte-kit/

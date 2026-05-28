@@ -1,0 +1,114 @@
+@layer components {
+  .admin-layout {
+    @apply grid gap-4 xl:grid-cols-[1fr_300px];
+  }
+
+  .admin-panel {
+    @apply min-w-0 bg-lsx-panel/94;
+  }
+
+  .admin-panel-content {
+    @apply grid gap-4 p-3 sm:p-5;
+  }
+
+  .flash-message {
+    @apply rounded-md border-2 border-[#9db65d] bg-[#fff8b9] p-3 font-bold;
+  }
+
+  .admin-sidebar {
+    @apply grid h-fit gap-4;
+  }
+
+  .admin-stats {
+    @apply grid gap-2 rounded-lg border-2 border-lsx-border bg-lsx-paper p-3;
+  }
+
+  .admin-stat {
+    @apply flex items-center justify-between gap-3 rounded-md bg-lsx-cream p-3;
+  }
+
+  .table-shell {
+    @apply overflow-x-auto rounded-lg border-2 border-lsx-border bg-lsx-paper;
+  }
+
+  .admin-table {
+    @apply w-full min-w-190 border-collapse text-left text-sm;
+  }
+
+  .admin-table th {
+    @apply bg-lsx-leaf px-3 py-2 text-white;
+  }
+
+  .admin-table td {
+    @apply border-t border-[#cbdc8a] px-3 py-3 align-top;
+  }
+
+  .admin-table tr:nth-child(even) td {
+    @apply bg-[#f7ffd6];
+  }
+
+  .muted {
+    @apply text-xs font-bold text-[#6f7650];
+  }
+
+  .raw-query {
+    @apply max-w-md break-all text-xs font-bold text-[#6f7650];
+  }
+
+  .danger-button {
+    @apply rounded-md border-2 border-[#7d2f28] bg-[#ffbfaa] px-3 py-2 text-sm font-black text-[#742217] transition hover:bg-lsx-warn;
+  }
+
+  .save-button {
+    @apply w-fit rounded-md border-2 border-[#30512f] bg-lsx-action px-4 py-2 font-black transition hover:bg-[#fff177];
+  }
+
+  .edit-panel {
+    @apply rounded-md bg-lsx-cream p-3;
+  }
+
+  .edit-panel summary,
+  .raw-request summary {
+    @apply cursor-pointer font-black;
+  }
+
+  .edit-form {
+    @apply mt-3 grid gap-3;
+  }
+
+  .field-grid {
+    @apply grid gap-2 md:grid-cols-2 xl:grid-cols-3;
+  }
+
+  .field-grid label {
+    @apply grid gap-1 text-xs font-black uppercase;
+  }
+
+  .valid-state {
+    @apply text-[#23743d];
+  }
+
+  .invalid-state {
+    @apply inline-flex items-center gap-1 text-[#9c2c1f];
+  }
+
+  .invalid-state img {
+    @apply h-5 w-5;
+  }
+
+  .event-summary {
+    @apply mt-2 gap-1;
+  }
+
+  .event-summary span {
+    @apply rounded bg-[#eef6bd] px-2 py-1 text-xs;
+  }
+
+  .raw-request {
+    @apply mt-2;
+  }
+
+  .raw-request code {
+    @apply block max-w-md break-all rounded bg-lsx-cream p-2;
+  }
+}

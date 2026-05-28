@@ -3,7 +3,9 @@ package lsx
 import (
 	"bytes"
 	"embed"
+	"encoding/json"
 	"html/template"
+	"io/fs"
 	"net/http"
 	"net/url"
 	"os"
@@ -13,10 +15,10 @@ import (
 	"strings"
 	"time"
 
-	webassets "lt2_reverse/lsx_server_go/assets"
 	"lt2_reverse/lsx_server_go/internal/eventpath"
 	"lt2_reverse/lsx_server_go/internal/lsx/compat"
 	"lt2_reverse/lsx_server_go/internal/lsxvalue"
+	webassets "lt2_reverse/lsx_server_go/web"
 )
 
 type leaderboardHeader struct {
@@ -58,18 +60,26 @@ type detailField struct {
 	Value string
 }
 
-type projectPage struct {
-	CSS          template.CSS
-	Title        string
-	Heading      string
-	BoardActive  bool
-	HelpActive   bool
-	DocsActive   bool
-	Findings     bool
-	Docs         bool
-	FindingsHTML template.HTML
-	BoardRows    []projectLeaderboardRow
-	BoardTotal   int
+type svelteProjectPage struct {
+	Title      string                  `json:"title"`
+	Heading    string                  `json:"heading"`
+	BoardRows  []projectLeaderboardRow `json:"boardRows,omitempty"`
+	BoardTotal int                     `json:"boardTotal,omitempty"`
+	Markdown   string                  `json:"markdown,omitempty"`
+}
+
+type svelteAppPage struct {
+	Title     string
+	Page      string
+	BodyClass string
+	DataJSON  template.JS
+	Styles    []string
+	Scripts   []string
+}
+
+type svelteManifestEntry struct {
+	File string   `json:"file"`
+	CSS  []string `json:"css"`
 }
 
 func (s *Server) handleProjectPage(w http.ResponseWriter, r *http.Request) {
@@ -82,12 +92,11 @@ func (s *Server) handleProjectPage(w http.ResponseWriter, r *http.Request) {
 	query := normalizedLeaderboardQuery(r.URL.Query())
 	rows = filterRows(rows, query)
 	sortRows(rows, query.Get("sort"))
-	s.handleProjectShell(w, r, projectPage{
-		Title:       "Lemonade Tycoon 2 LSX Revival",
-		Heading:     "LSX",
-		BoardActive: true,
-		BoardRows:   newProjectLeaderboardRows(rows, 3),
-		BoardTotal:  len(rows),
+	s.renderSvelteApp(w, r, "home", "Lemonade Tycoon 2 LSX Revival", "", svelteProjectPage{
+		Title:      "Lemonade Tycoon 2 LSX Revival",
+		Heading:    "LSX",
+		BoardRows:  newProjectLeaderboardRows(rows, 3),
+		BoardTotal: len(rows),
 	})
 }
 
@@ -107,74 +116,88 @@ func newProjectLeaderboardRows(rows []LeaderboardRow, limit int) []projectLeader
 }
 
 func (s *Server) handleFindingsPage(w http.ResponseWriter, r *http.Request) {
-	findingsHTML, err := webassets.FS.ReadFile("project/findings/content.html.tmpl")
+	findingsMarkdown, err := webassets.FS.ReadFile("static/project/findings/content.md")
 	if err != nil {
 		s.emit(r, "project_error", http.StatusInternalServerError, err.Error())
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
-	s.handleProjectShellTemplate(w, r, "project/findings/index.html.tmpl", projectPage{
-		Title:        "LSX Reverse Engineering Findings",
-		Heading:      "Findings",
-		HelpActive:   true,
-		Findings:     true,
-		FindingsHTML: template.HTML(findingsHTML),
+	s.renderSvelteApp(w, r, "findings", "LSX Reverse Engineering Findings", "findings-page", svelteProjectPage{
+		Title:    "LSX Reverse Engineering Findings",
+		Heading:  "Findings",
+		Markdown: string(findingsMarkdown),
 	})
 }
 
 func (s *Server) handleDocsPage(w http.ResponseWriter, r *http.Request) {
-	s.handleProjectShellTemplate(w, r, "project/docs/index.html.tmpl", projectPage{
-		Title:      "LSX API Documentation",
-		Heading:    "Docs",
-		DocsActive: true,
-		Docs:       true,
+	s.renderSvelteApp(w, r, "docs", "LSX API Documentation", "docs-page", svelteProjectPage{
+		Title:   "LSX API Documentation",
+		Heading: "Docs",
 	})
 }
 
-func (s *Server) handleProjectShell(w http.ResponseWriter, r *http.Request, page projectPage) {
-	s.handleProjectShellTemplate(w, r, "project.html.tmpl", page)
-}
-
-func (s *Server) handleProjectShellTemplate(w http.ResponseWriter, r *http.Request, templateName string, page projectPage) {
-	css, err := projectCSS()
+func (s *Server) renderSvelteApp(w http.ResponseWriter, r *http.Request, page string, title string, bodyClass string, data any) {
+	styles, scripts, err := svelteAppAssets()
 	if err != nil {
-		s.emit(r, "project_error", http.StatusInternalServerError, err.Error())
+		s.emit(r, "svelte_error", http.StatusInternalServerError, err.Error())
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
+	payload, err := json.Marshal(data)
+	if err != nil {
+		s.emit(r, "svelte_error", http.StatusInternalServerError, err.Error())
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
 	var body bytes.Buffer
-	page.CSS = template.CSS(css)
-	if err := executeProjectTemplate(&body, templateName, page); err != nil {
-		s.emit(r, "project_error", http.StatusInternalServerError, err.Error())
+	err = svelteAppTemplate.ExecuteTemplate(&body, "app.html.tmpl", svelteAppPage{
+		Title:     title,
+		Page:      page,
+		BodyClass: bodyClass,
+		DataJSON:  template.JS(payload),
+		Styles:    styles,
+		Scripts:   scripts,
+	})
+	if err != nil {
+		s.emit(r, "svelte_error", http.StatusInternalServerError, err.Error())
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
+
 	w.Header().Set("Content-Type", "text/html; charset=utf-8")
 	w.WriteHeader(http.StatusOK)
-	switch {
-	case page.Findings:
+	switch page {
+	case "findings":
 		s.emit(r, "findings", http.StatusOK, "rendered findings page")
-	case page.Docs:
+	case "docs":
 		s.emit(r, "docs", http.StatusOK, "rendered docs page")
+	case "admin", "admin-login":
+		s.emit(r, "admin", http.StatusOK, "rendered admin page")
 	default:
 		s.emit(r, "project", http.StatusOK, "rendered project page")
 	}
 	_, _ = body.WriteTo(w)
 }
 
-func executeProjectTemplate(body *bytes.Buffer, templateName string, page projectPage) error {
-	if templateName == "project.html.tmpl" {
-		return templates.ExecuteTemplate(body, templateName, page)
-	}
-	data, err := webassets.FS.ReadFile(templateName)
+func svelteAppAssets() ([]string, []string, error) {
+	data, err := fs.ReadFile(webassets.DistFS(), "manifest.json")
 	if err != nil {
-		return err
+		return nil, nil, err
 	}
-	tmpl, err := template.New(templateName).Parse(string(data))
-	if err != nil {
-		return err
+	var manifest map[string]svelteManifestEntry
+	if err := json.Unmarshal(data, &manifest); err != nil {
+		return nil, nil, err
 	}
-	return tmpl.Execute(body, page)
+	entry, ok := manifest["src/main.ts"]
+	if !ok {
+		return nil, nil, os.ErrNotExist
+	}
+	styles := make([]string, 0, len(entry.CSS))
+	for _, css := range entry.CSS {
+		styles = append(styles, "/project/asset/svelte/"+css)
+	}
+	return styles, []string{"/project/asset/svelte/" + entry.File}, nil
 }
 
 func (s *Server) handleProjectAsset(w http.ResponseWriter, r *http.Request) {
@@ -184,7 +207,7 @@ func (s *Server) handleProjectAsset(w http.ResponseWriter, r *http.Request) {
 		http.NotFound(w, r)
 		return
 	}
-	data, err := webassets.FS.ReadFile(assetPath)
+	data, err := readProjectAsset(assetPath)
 	if err != nil {
 		http.NotFound(w, r)
 		return
@@ -244,7 +267,7 @@ func projectAssetPath(name string) (string, bool) {
 		return assetPath, true
 	}
 
-	if !strings.HasPrefix(name, "findings/vendor/shiki/") {
+	if !strings.HasPrefix(name, "svelte/") {
 		return "", false
 	}
 
@@ -253,7 +276,14 @@ func projectAssetPath(name string) (string, bool) {
 		return "", false
 	}
 
-	return "project/" + name, true
+	return strings.TrimPrefix(name, "svelte/"), true
+}
+
+func readProjectAsset(assetPath string) ([]byte, error) {
+	if strings.HasPrefix(assetPath, "static/") {
+		return webassets.FS.ReadFile(assetPath)
+	}
+	return fs.ReadFile(webassets.DistFS(), assetPath)
 }
 
 func (s *Server) handleLeaderboard(w http.ResponseWriter, r *http.Request) {
@@ -386,42 +416,11 @@ func (s *Server) handleStaticCSS(w http.ResponseWriter, r *http.Request, name st
 	http.ServeContent(w, r, name, time.Time{}, bytes.NewReader(data))
 }
 
-func (s *Server) handleProjectCSS(w http.ResponseWriter, r *http.Request) {
-	data, err := projectCSS()
-	if err != nil {
-		http.NotFound(w, r)
-		return
-	}
-	w.Header().Set("Content-Type", "text/css; charset=utf-8")
-	w.Header().Set("Cache-Control", "no-cache")
-	http.ServeContent(w, r, "project.css", time.Time{}, bytes.NewReader(data))
-}
-
-var projectCSSFiles = []string{
-	"project/css/base.css",
-	"project/css/shell.css",
-	"project/css/home.css",
-	"project/css/findings.css",
-	"project/css/docs.css",
-	"project/css/responsive.css",
-}
-
-func projectCSS() ([]byte, error) {
-	var css bytes.Buffer
-	for _, name := range projectCSSFiles {
-		data, err := webassets.FS.ReadFile(name)
-		if err != nil {
-			return nil, err
-		}
-		_, _ = css.Write(data)
-	}
-	return css.Bytes(), nil
-}
-
 //go:embed templates/*.html.tmpl
 var templateFS embed.FS
 
 var templates = template.Must(template.ParseFS(templateFS, "templates/*.html.tmpl"))
+var svelteAppTemplate = template.Must(template.ParseFS(webassets.FS, "templates/app.html.tmpl"))
 
 var leaderboardTemplate = templates.Lookup("leaderboard.html.tmpl")
 

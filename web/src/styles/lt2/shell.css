@@ -1,0 +1,94 @@
+@layer components {
+  .project-screen {
+    @apply bg-[#102916];
+  }
+
+  .screen-map {
+    @apply opacity-100;
+    filter: saturate(1.15) contrast(1.12);
+  }
+
+  .screen-wash {
+    background:
+      radial-gradient(circle at 28% 42%, rgba(168, 246, 72, 0.28), transparent 34%),
+      linear-gradient(90deg, rgba(10, 45, 25, 0.12), rgba(11, 33, 18, 0.72)),
+      linear-gradient(180deg, rgba(5, 24, 19, 0.38), rgba(120, 181, 52, 0.14) 48%, rgba(9, 39, 20, 0.5));
+  }
+
+  .project-shell {
+    @apply max-w-245 gap-0 px-3 py-2 sm:px-4;
+  }
+
+  .main-menu-link {
+    @apply absolute left-1/2 top-0 z-20 -translate-x-1/2 rounded-b-md bg-[#07120b] px-12 py-1 text-center text-[10px] font-bold tracking-[.08em] text-[#e8ffd0] shadow-[0_2px_5px_rgba(0,0,0,.45)];
+  }
+
+  .brand-header {
+    @apply relative z-10 flex-row items-end justify-between gap-4 border-0 bg-transparent p-0 shadow-none;
+  }
+
+  .project-nav {
+    @apply flex min-w-0 flex-1 items-end gap-1;
+  }
+
+  .project-tab {
+    @apply min-h-0 min-w-29 rounded-t-lg rounded-b-none border-2 border-b-0 border-[#6baa17] bg-[#5b9411]/90 px-4 py-2 font-display text-lg normal-case text-lt2-surface shadow-[inset_0_1px_0_rgba(255,255,255,.35),0_2px_6px_rgba(0,0,0,.35)] hover:translate-y-0 hover:bg-[#78b81b] sm:text-xl;
+  }
+
+  .project-tab span:first-child {
+    text-shadow: 0 1px 1px rgba(14, 38, 8, 0.8);
+  }
+
+  .project-tab img,
+  .project-tab > span:last-child:not(:first-child) {
+    @apply hidden;
+  }
+
+  .active-tab {
+    @apply bg-[#a7dc35] py-3 text-[#213515] shadow-[inset_0_2px_0_rgba(255,255,255,.55),0_3px_7px_rgba(0,0,0,.32)];
+  }
+
+  .brand-mark {
+    @apply hidden w-60 pb-1 text-left font-display text-xl uppercase tracking-[.12em] text-[#d9ffd1] lg:block;
+    text-shadow: 0 2px 3px rgba(0, 0, 0, 0.72);
+  }
+
+  .brand-mark img {
+    @apply h-auto w-full;
+  }
+
+  .project-panel {
+    @apply mt-0 min-h-140 overflow-hidden rounded-[26px] rounded-tl-none border-2 border-[#b9ed59] bg-[#dfff93]/85 shadow-[inset_0_2px_0_rgba(255,255,255,.65),0_18px_28px_rgba(0,0,0,.42)];
+  }
+
+  .panel-title {
+    @apply bg-[#a7dc35] px-6 py-2 font-display text-2xl text-[#203815];
+    border-color: rgba(255, 255, 255, 0.58);
+    text-shadow: 0 1px 0 rgba(255, 255, 255, 0.55);
+  }
+
+  .panel-body {
+    @apply p-4;
+  }
+
+  .home-screen .brand-mark,
+  .home-screen .panel-title {
+    @apply hidden;
+  }
+
+  .home-screen .project-panel {
+    @apply border-0 bg-transparent shadow-none;
+  }
+
+  .home-screen .panel-body {
+    @apply p-0;
+  }
+
+  .home-screen .project-shell {
+    @apply max-w-200 py-2;
+  }
+
+  .home-screen .project-tab {
+    @apply min-w-37.5 justify-center;
+  }
+}

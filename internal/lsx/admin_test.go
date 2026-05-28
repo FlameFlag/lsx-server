@@ -85,25 +85,20 @@ func TestAdminCustomPathHidesDefaultPath(t *testing.T) {
 		t.Fatalf("custom admin login status = %d, want 200", rr.Code)
 	}
 	body := rr.Body.String()
-	if !strings.Contains(body, `href="/manage-8f3c2a/asset/login.css"`) ||
-		!strings.Contains(body, `src="/project/asset/lt2_logo_text_only.avif"`) {
+	if !strings.Contains(body, `data-page="admin-login"`) ||
+		!strings.Contains(body, `"AdminPath":"/manage-8f3c2a"`) ||
+		!strings.Contains(body, `/project/asset/svelte/`) {
 		t.Fatalf("custom admin login did not use expected asset paths:\n%s", body)
 	}
 
 	rr = getRoute(t, srv, "/manage-8f3c2a/asset/admin.css")
-	if rr.Code != http.StatusOK {
-		t.Fatalf("custom admin asset status = %d, want 200", rr.Code)
-	}
-	if strings.Contains(rr.Body.String(), "/admin/asset/") {
-		t.Fatalf("custom admin stylesheet still contains default admin asset URL")
+	if rr.Code != http.StatusNotFound {
+		t.Fatalf("custom admin legacy stylesheet status = %d, want 404", rr.Code)
 	}
 
-	rr = getRoute(t, srv, "/manage-8f3c2a/asset/login.css")
-	if rr.Code != http.StatusOK {
-		t.Fatalf("custom admin login stylesheet status = %d, want 200", rr.Code)
-	}
-	if strings.Contains(rr.Body.String(), "/admin/asset/") {
-		t.Fatalf("custom admin login stylesheet still contains default admin asset URL")
+	rr = getRoute(t, srv, "/manage-8f3c2a/asset/warning.avif")
+	if rr.Code != http.StatusNotFound {
+		t.Fatalf("custom admin legacy image status = %d, want 404", rr.Code)
 	}
 }
 

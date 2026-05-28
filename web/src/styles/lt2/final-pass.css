@@ -1,0 +1,393 @@
+@layer components {
+  /*
+    Clean redraw pass: keep the LT2 green language, but remove the overdone
+    pill/oval treatment that made the controls feel broken instead of game-like.
+  */
+  .game-button {
+    @apply inline-flex min-h-14.5 w-full items-center justify-between gap-3 rounded-lg border-2 border-[#5aa314] bg-[#43b60e] px-5 py-2 font-display text-[26px] leading-none text-white shadow-[inset_0_2px_0_rgba(255,255,255,.72),0_3px_0_rgba(72,132,24,.55),0_5px_8px_rgba(33,83,18,.28)] hover:bg-[#55c81a];
+    background-image: linear-gradient(180deg, #9aef44 0%, #43bd12 44%, #159006 100%);
+    background-repeat: no-repeat;
+    background-size: 100% 100%;
+    text-shadow: 0 2px 2px rgba(25, 90, 9, 0.76);
+  }
+
+  .game-button span {
+    @apply min-w-0 flex-1 text-center;
+  }
+
+  .game-button img {
+    @apply h-12 w-12 shrink-0 object-contain;
+  }
+
+  .sort-card {
+    @apply min-h-46 rounded-lg border-2 border-[#96ca3a] bg-lt2-surface/88 p-4 shadow-[inset_0_2px_0_rgba(255,255,255,.75),0_3px_5px_rgba(83,142,30,.28)];
+    background-image: repeating-linear-gradient(
+      0deg,
+      rgba(255, 255, 255, 0.26) 0 10px,
+      rgba(145, 211, 52, 0.08) 10px 20px
+    );
+  }
+
+  .sort-card h2 {
+    @apply text-center font-display text-[28px] leading-none text-lt2-heading;
+  }
+
+  .sort-grid {
+    @apply mt-8 gap-2;
+  }
+
+  .credits-bar {
+    @apply mt-4 grid grid-cols-[150px_1fr_150px] items-stretch gap-3 rounded-lg border-2 border-lt2-frame bg-lt2-surface/76 p-2 shadow-lt2-card;
+    background-image: repeating-linear-gradient(
+      0deg,
+      rgba(255, 255, 255, 0.28) 0 10px,
+      rgba(150, 217, 56, 0.1) 10px 20px
+    );
+  }
+
+  .credit-title,
+  .source-link {
+    @apply flex min-h-21.5 items-center justify-center gap-2 rounded-lg border-2 border-lt2-border bg-lt2-soft/88 px-3 font-display text-xl text-lt2-heading shadow-lt2-inset;
+  }
+
+  .source-link {
+    @apply text-base;
+  }
+
+  .credit-title img,
+  .source-link img {
+    @apply h-12 w-12 shrink-0 object-contain;
+  }
+
+  .credit-list {
+    @apply grid grid-cols-2 gap-3;
+  }
+
+  .credit-link {
+    @apply inline-flex min-h-21.5 items-center gap-3 rounded-lg border-2 border-lt2-border bg-lt2-soft/82 px-4 py-2 text-sm font-black text-lt2-heading shadow-lt2-inset;
+  }
+
+  .credit-link img {
+    @apply h-14 w-14 shrink-0 rounded-none object-contain;
+  }
+
+  .admin-screen .screen-wash {
+    background: linear-gradient(
+      180deg,
+      rgba(255, 255, 255, 0.12),
+      rgba(166, 223, 65, 0.08) 48%,
+      rgba(25, 78, 28, 0.26)
+    );
+  }
+
+  .admin-shell {
+    @apply max-w-295 gap-4 px-4 py-4;
+  }
+
+  .admin-brand-header {
+    @apply h-31.5 max-w-290 rounded-3xl border-2 border-lt2-glow bg-[#dfffaa]/86 shadow-[inset_0_2px_0_rgba(255,255,255,.75),0_6px_8px_rgba(39,91,23,.28)];
+    background-image: repeating-linear-gradient(
+      0deg,
+      rgba(255, 255, 255, 0.26) 0 12px,
+      rgba(143, 211, 51, 0.12) 12px 24px
+    );
+  }
+
+  .admin-brand-mark,
+  .admin-screen .brand-mark {
+    @apply left-6 -top-0.5 w-75 translate-x-0;
+  }
+
+  .admin-nav {
+    @apply absolute bottom-5 left-85 right-6 z-30 flex items-center justify-end gap-5;
+  }
+
+  .admin-nav .project-tab,
+  .admin-nav button.project-tab {
+    @apply inline-flex min-h-0 items-center justify-center gap-2 rounded-none border-0 bg-transparent p-0 font-display text-[20px] leading-none text-[#4a8422] shadow-none hover:bg-transparent;
+    text-shadow: 0 1px 0 rgba(255, 255, 255, 0.7);
+  }
+
+  .admin-nav .project-tab > span:first-child {
+    transform: scaleX(0.74);
+  }
+
+  .admin-nav .project-tab img {
+    @apply h-11 w-11;
+  }
+
+  .admin-layout {
+    @apply grid items-start gap-4 xl:grid-cols-[minmax(0,1fr)_300px];
+  }
+
+  @media (min-width: 1024px) {
+    .admin-layout {
+      grid-template-columns: minmax(0, 1fr) 300px;
+    }
+  }
+
+  .admin-panel {
+    @apply overflow-hidden rounded-xl border-2 border-lt2-glow bg-lt2-surface/88 shadow-[inset_0_2px_0_rgba(255,255,255,.76),0_4px_7px_rgba(64,116,28,.28)];
+    background-image: none;
+  }
+
+  .admin-panel .panel-title {
+    @apply bg-[#a8df35] px-6 py-3 font-display text-[30px] leading-none text-white;
+    text-shadow: 0 2px 2px rgba(50, 111, 20, 0.65);
+  }
+
+  .admin-panel-content {
+    @apply p-4;
+  }
+
+  .admin-panel-content > form .game-button {
+    @apply w-auto min-w-90 max-w-full px-5;
+  }
+
+  .admin-panel-content > form .game-button span {
+    @apply text-left;
+  }
+
+  .admin-stats {
+    @apply rounded-lg border-2 border-lt2-frame bg-lt2-surface/90 p-2 shadow-lt2-card-soft;
+    background-image: none;
+  }
+
+  .admin-stat {
+    @apply grid min-h-13.5 grid-cols-[1fr_auto] items-center rounded-md border-2 border-lt2-border bg-lt2-soft/90 px-3 py-2 text-lt2-text;
+  }
+
+  .admin-stat + .admin-stat {
+    @apply mt-2;
+  }
+
+  .admin-stat dt {
+    @apply text-[11px] font-black uppercase leading-tight;
+  }
+
+  .admin-stat dd {
+    @apply min-w-0 text-right text-2xl font-black leading-none;
+  }
+
+  .admin-stat:last-child dd {
+    @apply max-w-43 wrap-break-word text-[16px] leading-tight;
+  }
+
+  .table-shell {
+    @apply mt-4 overflow-x-auto rounded-lg border-2 border-[#466832] bg-[#f8ffe6];
+  }
+
+  .admin-table th {
+    @apply bg-[#2f6048] px-4 py-3 text-left text-sm text-white;
+  }
+
+  .admin-table {
+    width: 100%;
+    min-width: 0;
+  }
+
+  .admin-table td {
+    @apply border-t border-[#c6e58e] bg-[#fbfff0] px-4 py-4 align-top text-sm;
+  }
+
+  .admin-table th:last-child,
+  .admin-table td:last-child {
+    @apply w-24 text-center;
+  }
+
+  .edit-panel {
+    @apply rounded-lg border-2 border-[#b5da69] bg-[#efffc1] p-4;
+  }
+
+  @media (max-width: 900px) {
+    .admin-brand-header {
+      @apply h-auto px-4 pb-5 pt-20;
+    }
+
+    .admin-nav {
+      @apply static grid grid-cols-2 gap-3;
+    }
+
+    .admin-nav .project-tab,
+    .admin-nav button.project-tab {
+      @apply text-xl;
+    }
+  }
+
+  @media (max-width: 760px) {
+    .credits-bar {
+      @apply grid-cols-1;
+    }
+
+    .credit-list {
+      @apply grid-cols-1;
+    }
+  }
+
+  /* LT2 reference pass: larger menu tabs and report-style admin data panels. */
+  .admin-brand-header {
+    @apply h-34;
+  }
+
+  .admin-nav {
+    @apply bottom-4 left-90 gap-6;
+  }
+
+  .admin-nav .project-tab,
+  .admin-nav button.project-tab {
+    @apply gap-3 text-[28px];
+  }
+
+  .admin-nav .project-tab img {
+    @apply h-14 w-14;
+  }
+
+  .admin-panel {
+    @apply rounded-[18px] border-white bg-lt2-panel/86;
+  }
+
+  .admin-panel .panel-title {
+    @apply bg-[#9dde2d] px-6 py-3 text-[34px];
+  }
+
+  .admin-panel-content {
+    @apply p-4;
+  }
+
+  .admin-panel-content > form .game-button {
+    @apply min-w-105 rounded-[18px] text-[28px];
+  }
+
+  .table-shell {
+    @apply rounded-[18px] border-2 border-[#a5d044] bg-[#dfff9c]/58 p-3 shadow-[inset_0_2px_0_rgba(255,255,255,.82)];
+    background-image: repeating-linear-gradient(
+      0deg,
+      rgba(255, 255, 255, 0.2) 0 12px,
+      rgba(126, 205, 30, 0.09) 12px 24px
+    );
+  }
+
+  .admin-table {
+    border-collapse: separate;
+    border-spacing: 0 8px;
+    table-layout: fixed;
+  }
+
+  .admin-table th {
+    @apply border-0 bg-[#99cc38] px-4 py-2 font-display text-[20px] leading-none text-white;
+    text-shadow: 0 2px 1px rgba(49, 104, 20, 0.55);
+  }
+
+  .admin-table th:first-child {
+    @apply rounded-l-lg;
+  }
+
+  .admin-table th:last-child {
+    @apply rounded-r-lg;
+  }
+
+  .admin-table td {
+    @apply border-y-2 border-[#b6d96c] bg-[#f4ffe0] px-4 py-3 text-[13px];
+  }
+
+  .admin-table tr:nth-child(even) td {
+    @apply bg-[#e9ffbd];
+  }
+
+  .admin-table td:first-child {
+    @apply rounded-l-lg border-l-2;
+  }
+
+  .admin-table td:last-child {
+    @apply rounded-r-lg border-r-2;
+  }
+
+  .admin-table th:nth-child(1),
+  .admin-table td:nth-child(1) {
+    width: 150px;
+  }
+
+  .admin-table th:nth-child(3),
+  .admin-table td:nth-child(3) {
+    width: 135px;
+  }
+
+  .admin-table th:nth-child(4),
+  .admin-table td:nth-child(4) {
+    width: 170px;
+  }
+
+  .admin-table th:last-child,
+  .admin-table td:last-child {
+    width: 104px;
+  }
+
+  .edit-panel {
+    @apply rounded-[14px] border-2 border-[#a9cf4d] bg-lt2-surface/80 p-3 shadow-[inset_0_2px_0_rgba(255,255,255,.72)];
+  }
+
+  .edit-panel summary {
+    @apply mb-3 w-full cursor-pointer rounded-md border-2 border-lt2-border bg-lt2-soft px-4 py-1 text-left font-display text-[18px] leading-none text-lt2-text shadow-lt2-inset outline-none;
+  }
+
+  .edit-panel summary:focus-visible {
+    @apply ring-2 ring-[#dfff70];
+  }
+
+  .field-grid {
+    @apply gap-2;
+  }
+
+  .field-grid label span {
+    @apply text-[11px] leading-none text-[#32541e];
+  }
+
+  .admin-input {
+    @apply min-h-10 rounded-md bg-[#fffdf0] text-[15px];
+  }
+
+  .edit-panel .field-grid {
+    @apply gap-x-3 gap-y-2;
+  }
+
+  .edit-panel .field-grid label {
+    @apply gap-0;
+  }
+
+  .edit-panel .field-grid label span {
+    @apply mb-0.5 pl-2 text-left font-display text-[13px] leading-none text-[#4d7a25];
+    text-shadow: 0 1px 0 rgba(255, 255, 255, 0.72);
+  }
+
+  .edit-panel .admin-input {
+    @apply min-h-8.5 rounded-lg border-2 border-[#9bc05f] bg-[#fffbe9] px-3 py-1 text-[15px] font-black text-lt2-ink shadow-[inset_0_2px_3px_rgba(110,142,67,.18),inset_0_1px_0_rgba(255,255,255,.92)] focus:border-[#6fb121] focus:ring-2 focus:ring-[#dfff70];
+  }
+
+  .edit-panel .save-button {
+    @apply mt-2 cursor-pointer rounded-lg border-2 border-[#8aaa2a] bg-lsx-action px-4 py-2 font-display text-[17px] leading-none text-lt2-ink shadow-lt2-button hover:bg-[#fff177];
+  }
+
+  .admin-stats {
+    @apply rounded-[14px] border-white bg-lt2-panel/82 p-3 shadow-[inset_0_2px_0_rgba(255,255,255,.78),0_3px_6px_rgba(53,105,24,.25)];
+  }
+
+  .admin-stat {
+    @apply min-h-14.5 rounded-md bg-[#f0ffd2]/90;
+  }
+
+  .admin-stat dd {
+    @apply font-display text-[30px] leading-none;
+  }
+
+  .admin-stat:last-child dd {
+    @apply font-sans text-[14px] leading-tight;
+  }
+
+  .danger-button {
+    @apply cursor-pointer rounded-md border-2 border-[#8fc42c] bg-[#f4ffd8] px-4 py-2 font-display text-[18px] leading-none text-[#4f7c22] shadow-[inset_0_2px_0_rgba(255,255,255,.78),0_2px_0_rgba(94,145,35,.28)] hover:bg-[#e6ffad];
+  }
+
+  .admin-table td:last-child .danger-button {
+    @apply w-full px-2;
+  }
+}

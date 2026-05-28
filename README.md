@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="assets/project/lt2_logo_text_only.avif" alt="Lemonade Tycoon 2 New York Edition" width="520">
+  <img src="web/static/project/lt2_logo_text_only.avif" alt="Lemonade Tycoon 2 New York Edition" width="520">
 </p>
 
 <h1 align="center">LSX Server</h1>
@@ -31,19 +31,19 @@ It keeps the preservation work close to the running service. The server stores u
   </tr>
   <tr>
     <td width="25%" align="center">
-      <img src="assets/project/lt2_icon_play.avif" alt="" width="96"><br>
+      <img src="web/static/project/lt2_icon_play.avif" alt="" width="96"><br>
       Recreates the endpoints and tiny assets the recovered game client expects.
     </td>
     <td width="25%" align="center">
-      <img src="assets/project/lt2_icon_lsx.avif" alt="" width="96"><br>
+      <img src="web/static/project/lt2_icon_lsx.avif" alt="" width="96"><br>
       Serves recovered LSX pages and stores fresh score uploads in SQLite.
     </td>
     <td width="25%" align="center">
-      <img src="assets/project/lt2_icon_findings.avif" alt="" width="96"><br>
+      <img src="web/static/project/lt2_icon_findings.avif" alt="" width="96"><br>
       Documents the protocol, checksum, date scalar, upload queue, and page shape.
     </td>
     <td width="25%" align="center">
-      <img src="assets/admin/pitcher.avif" alt="" width="96"><br>
+      <img src="web/static/admin/pitcher.avif" alt="" width="96"><br>
       Provides admin cleanup, a live TUI, and Discord sync alerts.
     </td>
   </tr>
@@ -256,7 +256,7 @@ Default events: `sync`, `sync_rejected`, `sync_error`, `account`, `account_error
 <table>
   <tr>
     <td width="120" align="center">
-      <img src="assets/project/lt2_asset_credits.avif" alt="" width="96">
+      <img src="web/static/project/lt2_asset_credits.avif" alt="" width="96">
     </td>
     <td>
       <ul>

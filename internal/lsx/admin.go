@@ -1,16 +1,12 @@
 package lsx
 
 import (
-	"bytes"
 	"crypto/hmac"
 	"crypto/sha256"
 	"crypto/subtle"
-	"embed"
 	"encoding/base64"
 	"errors"
 	"fmt"
-	"html/template"
-	"io/fs"
 	"net/http"
 	"net/url"
 	"path"
@@ -18,10 +14,8 @@ import (
 	"strings"
 	"time"
 
-	webassets "lt2_reverse/lsx_server_go/assets"
 	"lt2_reverse/lsx_server_go/internal/eventpath"
 	"lt2_reverse/lsx_server_go/internal/lsx/compat"
-	"lt2_reverse/lsx_server_go/internal/lsxvalue"
 	"lt2_reverse/lsx_server_go/internal/strutil"
 )
 
@@ -29,9 +23,6 @@ const (
 	defaultAdminPath = "/admin"
 	adminCookieName  = "lsx_admin"
 )
-
-//go:embed admin_templates/*.html.tmpl
-var adminFS embed.FS
 
 type adminPage struct {
 	Title       string
@@ -75,10 +66,6 @@ type adminEvent struct {
 func (s *Server) handleAdmin(w http.ResponseWriter, r *http.Request) {
 	if !s.adminEnabled() {
 		http.NotFound(w, r)
-		return
-	}
-	if strings.HasPrefix(r.URL.Path, s.adminURL("asset")+"/") {
-		s.handleAdminAsset(w, r)
 		return
 	}
 	switch s.adminRouteSuffix(r.URL.Path) {
@@ -175,25 +162,6 @@ func (s *Server) adminURL(parts ...string) string {
 	return out.String()
 }
 
-func (s *Server) handleAdminAsset(w http.ResponseWriter, r *http.Request) {
-	name := strings.TrimPrefix(r.URL.Path, s.adminURL("asset")+"/")
-	if name == "" || name == "." || strings.Contains(name, "\\") || !fs.ValidPath(name) {
-		http.NotFound(w, r)
-		return
-	}
-	data, err := webassets.FS.ReadFile("admin/" + name)
-	if err != nil {
-		http.NotFound(w, r)
-		return
-	}
-	contentType := assetContentType(name)
-	if contentType == "" {
-		http.NotFound(w, r)
-		return
-	}
-	serveWebAsset(w, r, name, contentType, data)
-}
-
 func (s *Server) handleAdminLogin(w http.ResponseWriter, r *http.Request) {
 	if s.adminAuthenticated(r) {
 		http.Redirect(w, r, s.adminPath, http.StatusSeeOther)
@@ -212,17 +180,11 @@ func (s *Server) handleAdminLogin(w http.ResponseWriter, r *http.Request) {
 			page.Error = "Invalid admin credentials."
 		}
 	}
-	s.renderAdminLogin(w, page)
+	s.renderAdminLogin(w, r, page)
 }
 
-func (s *Server) renderAdminLogin(w http.ResponseWriter, page adminLoginPage) {
-	var body bytes.Buffer
-	if err := adminLoginTemplate.Execute(&body, page); err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
-	w.Header().Set("Content-Type", "text/html; charset=utf-8")
-	_, _ = body.WriteTo(w)
+func (s *Server) renderAdminLogin(w http.ResponseWriter, r *http.Request, page adminLoginPage) {
+	s.renderSvelteApp(w, r, "admin-login", "LSX Admin Login", "", page)
 }
 
 func (s *Server) renderAdmin(w http.ResponseWriter, r *http.Request) {
@@ -247,13 +209,7 @@ func (s *Server) renderAdmin(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	var body bytes.Buffer
-	if err := adminTemplate.Execute(&body, page); err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
-	w.Header().Set("Content-Type", "text/html; charset=utf-8")
-	_, _ = body.WriteTo(w)
+	s.renderSvelteApp(w, r, "admin", page.Title, "", page)
 }
 
 func (s *Server) adminActiveSection(requestPath string) string {
@@ -525,31 +481,4 @@ func (s *Server) flash(w http.ResponseWriter, r *http.Request) string {
 	http.SetCookie(w, &http.Cookie{Name: "lsx_admin_flash", Path: s.adminPath, MaxAge: -1})
 	value, _ := url.QueryUnescape(cookie.Value)
 	return value
-}
-
-var adminFuncMap = template.FuncMap{
-	"field": func(fields map[string]string, name string) string { return fields[name] },
-	"money": lsxvalue.FormatCents,
-	"time":  adminTime,
-}
-
-var adminTemplates = template.Must(template.New("").
-	Funcs(adminFuncMap).
-	ParseFS(adminTemplateFS(), "admin_templates/*.html.tmpl"))
-var adminLoginTemplate = adminTemplates.Lookup("login.html.tmpl")
-var adminTemplate = adminTemplates.Lookup("admin.html.tmpl")
-
-func adminTemplateFS() fs.FS {
-	sub, err := fs.Sub(adminFS, ".")
-	if err != nil {
-		panic(err)
-	}
-	return sub
-}
-
-func adminTime(t time.Time) string {
-	if t.IsZero() {
-		return ""
-	}
-	return t.Local().Format("2006-01-02 15:04:05")
 }

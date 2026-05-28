@@ -1,0 +1,113 @@
+@layer components {
+  .home-layout {
+    @apply grid gap-4 lg:grid-cols-[1fr_320px];
+  }
+
+  .leaderboard-card,
+  .content-card,
+  .login-card,
+  .admin-card {
+    @apply rounded-lg border-2 border-lsx-border bg-lsx-paper p-4;
+  }
+
+  .leaderboard-card {
+    @apply bg-[#faffdb] shadow-inner;
+  }
+
+  .card-header {
+    @apply flex flex-col gap-4 border-b-2 border-[#cedb82] pb-4 lg:flex-row lg:items-end lg:justify-between;
+  }
+
+  .brand-lockup {
+    @apply flex items-center gap-3;
+  }
+
+  .brand-lockup img,
+  .login-lockup img {
+    @apply h-16 w-16 rounded-md border-2 border-lsx-border bg-[#fff4a4] object-contain;
+  }
+
+  .brand-lockup img {
+    @apply h-20 w-20;
+  }
+
+  .eyebrow {
+    @apply text-sm font-black uppercase text-[#5f7b2e];
+  }
+
+  .compact-heading {
+    @apply font-display text-3xl text-lsx-ink;
+  }
+
+  .leaderboard-summary {
+    @apply rounded-md border-2 border-[#9db65d] bg-[#e4f29a] px-4 py-3 text-sm font-bold;
+  }
+
+  .board-table {
+    @apply mt-5 overflow-hidden rounded-lg border-2 border-[#496735];
+  }
+
+  .board-row {
+    @apply grid grid-cols-[72px_1fr_140px] items-center px-3 py-3 text-sm;
+  }
+
+  .board-row.head {
+    @apply bg-[#2f553c] py-2 font-bold uppercase text-white;
+  }
+
+  .board-row.body {
+    @apply border-t border-[#c5d989] bg-white even:bg-[#f0fac7];
+  }
+
+  .side-stack {
+    @apply grid content-start gap-4;
+  }
+
+  .game-button {
+    @apply inline-flex items-center justify-between gap-3 rounded-md border-2 border-[#30512f] bg-lsx-action px-4 py-3 font-black text-lsx-ink shadow-[0_5px_0_rgba(35,70,34,.34)] transition hover:-translate-y-0.5 hover:bg-[#fff177];
+  }
+
+  .game-button img {
+    @apply h-12 w-12 object-contain;
+  }
+
+  .sort-grid {
+    @apply mt-3 grid grid-cols-2 gap-2;
+  }
+
+  .sort-link {
+    @apply rounded-md border-2 border-lsx-border bg-white px-3 py-2 text-center text-sm font-black transition hover:bg-[#e4f29a];
+  }
+
+  .credits-bar {
+    @apply mt-4 flex flex-col gap-3 rounded-lg border-2 border-[#465e32] bg-[#faffdb] p-3 sm:flex-row sm:items-center sm:justify-between;
+  }
+
+  .credit-title {
+    @apply flex items-center gap-2 font-display text-2xl;
+  }
+
+  .credit-title img {
+    @apply h-14 w-14;
+  }
+
+  .credit-list {
+    @apply flex flex-wrap gap-2;
+  }
+
+  .credit-link {
+    @apply inline-flex items-center gap-2 rounded-md border-2 border-[#9db65d] bg-white px-3 py-2 text-sm font-bold;
+  }
+
+  .credit-link img {
+    @apply h-10 w-10 rounded-md;
+  }
+
+  .source-link {
+    @apply inline-flex items-center gap-2 rounded-md border-2 border-lsx-border bg-white px-3 py-2 font-bold;
+  }
+
+  .source-link img {
+    @apply h-8 w-8;
+  }
+}

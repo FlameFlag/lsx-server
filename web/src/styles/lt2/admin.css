@@ -1,0 +1,142 @@
+@layer components {
+  .admin-shell {
+    @apply relative z-10 mx-auto grid w-full max-w-7xl gap-4 px-4 py-6;
+  }
+
+  .admin-brand-header {
+    @apply mx-auto h-39 w-full max-w-305;
+  }
+
+  .admin-brand-mark,
+  .admin-screen .brand-mark {
+    @apply left-8 -top-2.5 w-82.5 translate-x-0;
+  }
+
+  .admin-nav {
+    @apply absolute bottom-5 left-90 right-8 z-30 grid grid-cols-4 items-center gap-3;
+  }
+
+  .admin-nav form {
+    @apply m-0;
+  }
+
+  .admin-nav .project-tab {
+    @apply justify-center gap-2 text-[22px];
+  }
+
+  .admin-nav .project-tab img {
+    @apply h-12 w-12;
+  }
+
+  .admin-layout {
+    @apply grid items-start gap-4 xl:grid-cols-[1fr_300px];
+  }
+
+  .admin-panel {
+    @apply overflow-hidden rounded-3xl border-2 border-white bg-lt2-panel/82 shadow-[inset_0_2px_0_rgba(255,255,255,.78),0_8px_0_rgba(73,142,29,.42),0_14px_20px_rgba(14,48,16,.32)];
+    background-image: repeating-linear-gradient(
+      0deg,
+      rgba(255, 255, 255, 0.22) 0 13px,
+      rgba(157, 223, 62, 0.1) 13px 26px
+    );
+  }
+
+  .admin-panel .panel-title {
+    @apply bg-[#a8df35]/80 px-8 py-3 font-display text-[34px] leading-none text-white;
+    text-shadow: 0 2px 2px rgba(50, 111, 20, 0.72);
+  }
+
+  .admin-panel-content {
+    @apply p-5;
+  }
+
+  .admin-sidebar {
+    @apply grid gap-4;
+  }
+
+  .admin-stats {
+    @apply rounded-xl border-2 border-lt2-frame bg-lt2-surface/86 p-3 shadow-lt2-card;
+    background-image: repeating-linear-gradient(
+      0deg,
+      rgba(255, 255, 255, 0.28) 0 10px,
+      rgba(150, 217, 56, 0.1) 10px 20px
+    );
+  }
+
+  .admin-stat {
+    @apply rounded-lg border-2 border-lt2-border bg-lt2-soft/82 p-3 text-lt2-text;
+  }
+
+  .admin-stat dt {
+    @apply text-xs font-black uppercase;
+  }
+
+  .admin-stat dd {
+    @apply text-3xl font-black;
+  }
+
+  .table-shell {
+    @apply mt-4 overflow-x-auto rounded-lg border-2 border-[#466832] bg-[#f8ffe6];
+  }
+
+  .admin-table {
+    @apply min-w-215 text-lt2-ink;
+  }
+
+  .admin-table th {
+    @apply bg-[#2f6048] px-4 py-3 text-white;
+  }
+
+  .admin-table td {
+    @apply border-t border-[#c6e58e] bg-[#fbfff0] px-4 py-4 align-top;
+  }
+
+  .admin-table tr:nth-child(even) td {
+    @apply bg-[#efffc1];
+  }
+
+  .edit-panel {
+    @apply rounded-xl border-2 border-[#c6e58e] bg-[#efffc1] p-4;
+  }
+
+  .field-grid {
+    @apply grid gap-3 md:grid-cols-2 xl:grid-cols-3;
+  }
+
+  @media (min-width: 1024px) {
+    .field-grid {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+  }
+
+  .admin-input {
+    @apply min-h-12 rounded-md border-2 border-[#83a25d] bg-lsx-paper px-3 py-2 font-black text-lt2-ink outline-none focus:border-[#5d9b25] focus:ring-2 focus:ring-[#bdf05a];
+  }
+
+  .save-button {
+    @apply rounded-lg border-2 border-[#38651f] bg-lsx-action px-4 py-2 font-black text-lt2-ink shadow-[0_2px_0_rgba(69,91,26,.36)] hover:bg-[#fff177];
+  }
+
+  .danger-button {
+    @apply rounded-lg border-2 border-[#9a3b2d] bg-[#ffd9cd] px-4 py-2 font-black text-[#7a281b] shadow-[0_2px_0_rgba(91,32,26,.2)] hover:bg-[#ffd0c2];
+  }
+
+  @media (max-width: 900px) {
+    .admin-brand-mark,
+    .admin-screen .brand-mark {
+      @apply left-1/2 w-65 -translate-x-1/2;
+    }
+
+    .admin-brand-header {
+      @apply h-auto px-4 pb-5 pt-20;
+    }
+
+    .admin-nav {
+      @apply static grid-cols-2 gap-3;
+    }
+
+    .admin-nav .project-tab {
+      @apply text-xl;
+    }
+  }
+}

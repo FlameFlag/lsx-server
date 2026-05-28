@@ -1,0 +1,29 @@
+{
+  "name": "lsx-server",
+  "private": true,
+  "workspaces": [
+    "web"
+  ],
+  "scripts": {
+    "build": "npm --prefix web run build",
+    "check": "npm --prefix web run check && npm run lint",
+    "dev": "npm --prefix web run dev",
+    "fallow": "fallow",
+    "fallow:audit": "fallow audit --format json --quiet --explain",
+    "fallow:dead-code": "fallow dead-code",
+    "fallow:dupes": "fallow dupes",
+    "fallow:fix:dry-run": "fallow fix --dry-run",
+    "fallow:health": "fallow health",
+    "fallow:list": "fallow list --entry-points --files --plugins --workspaces",
+    "format": "npm run format:tailwind && npm run format:web && npm run format:go",
+    "format:go": "gofmt -w $(find . -name '*.go' -not -path './vendor/*')",
+    "format:tailwind": "cd web && tailwind-suggest-canonical-classes \"src/**/*.{svelte,ts,css}\" --css src/app.css",
+    "format:web": "biome check --write",
+    "lint": "biome ci"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "2.4.16",
+    "@laststance/tailwind-suggest-canonical-classes": "^0.1.1",
+    "fallow": "2.84.0"
+  }
+}
