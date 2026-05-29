@@ -1,0 +1,13 @@
+[project]
+name = "lemonade2-static-unpacking"
+version = "0.1.0"
+description = "Local tooling for Lemonade Tycoon 2 Armadillo static-unpacking analysis"
+requires-python = ">=3.11"
+dependencies = [
+  "capstone>=5.0.0",
+  "construct>=2.10.70",
+  "pefile>=2024.8.26",
+]
+
+[tool.uv]
+package = false

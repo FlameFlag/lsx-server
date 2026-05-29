@@ -1,0 +1,9 @@
+/runs/*
+!/runs/.gitkeep
+!/runs/latest
+/.venv/
+/build/
+/config/local.env
+__pycache__/
+*.py[cod]
+.DS_Store
