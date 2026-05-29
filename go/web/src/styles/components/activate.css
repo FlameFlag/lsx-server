@@ -1,0 +1,104 @@
+@layer components {
+  .activate-page {
+    @apply mx-auto grid max-w-5xl gap-5;
+  }
+
+  .activate-grid {
+    @apply grid gap-4 lg:grid-cols-2;
+  }
+
+  .activate-section,
+  .activate-card {
+    @apply min-w-0 rounded-lg border-2 border-lsx-field bg-lsx-cream p-4 text-sm font-bold leading-7;
+  }
+
+  .activate-card h3,
+  .activate-section h3 {
+    @apply mb-2 font-display text-2xl text-lsx-ink;
+  }
+
+  .activate-card p,
+  .activate-section p {
+    @apply max-w-3xl;
+  }
+
+  .keygen-panel {
+    @apply bg-[#faffdb];
+  }
+
+  .keygen-form {
+    @apply mt-4 grid gap-3;
+  }
+
+  .keygen-form label,
+  .keygen-output dt {
+    @apply text-xs font-black uppercase tracking-wide text-[#5f7b2e];
+  }
+
+  .keygen-form input {
+    @apply w-full max-w-md rounded-md border-2 border-lsx-field bg-white px-3 py-2 font-bold text-lsx-ink outline-none focus:border-lsx-border focus:bg-[#fff8b9];
+  }
+
+  .keygen-form .game-button {
+    @apply w-fit;
+  }
+
+  .keygen-form .game-button:disabled {
+    @apply cursor-not-allowed opacity-60;
+  }
+
+  .keygen-output {
+    @apply mt-4 grid gap-3 rounded-md border-2 border-lsx-border bg-white p-3;
+  }
+
+  .keygen-output section {
+    @apply grid gap-1;
+  }
+
+  .keygen-output dd {
+    @apply m-0 min-w-0;
+  }
+
+  .keygen-output code,
+  .copy-block {
+    @apply select-all rounded-md bg-[#1f2519] px-3 py-2 text-[#f8ffe8];
+    overflow-wrap: anywhere;
+    word-break: normal;
+  }
+
+  .keygen-output code {
+    @apply block w-fit max-w-full;
+  }
+
+  .activation-key {
+    @apply w-full;
+  }
+
+  .copy-block {
+    @apply mt-3 overflow-x-auto whitespace-pre-wrap text-sm leading-6;
+  }
+
+  .response-grid {
+    @apply mt-3 grid gap-3 md:grid-cols-2;
+  }
+
+  .response-card {
+    @apply min-w-0 rounded-md border-2 border-lt2-border bg-lsx-paper p-3;
+  }
+
+  .response-card h4 {
+    @apply mb-2 font-display text-xl leading-none text-lt2-heading;
+  }
+
+  .response-card p {
+    @apply mb-2 max-w-none leading-6;
+  }
+
+  .response-card code {
+    overflow-wrap: anywhere;
+  }
+
+  .activate-footer {
+    @apply border-t-2 border-[#cedb82] pt-4 text-center text-xs font-bold text-lsx-muted;
+  }
+}

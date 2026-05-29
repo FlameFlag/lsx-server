@@ -1,29 +1,30 @@
 <script lang="ts">
-  import type { AccountRequest, AdminData, AdminEvent, AdminSubmission } from "../types";
+import type { AccountRequest, AdminData, AdminEvent, AdminSubmission } from "../types";
 
-  export let data: AdminData;
+export let data: AdminData;
 
-  const money = (cents: number) => (cents / 100).toLocaleString(undefined, {
+const money = (cents: number) =>
+  (cents / 100).toLocaleString(undefined, {
     minimumFractionDigits: 2,
     maximumFractionDigits: 2
   });
 
-  const dateTime = (value: string) => {
-    const date = new Date(value);
-    if (Number.isNaN(date.getTime())) return "";
-    return date.toLocaleString();
-  };
+const dateTime = (value: string) => {
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return "";
+  return date.toLocaleString();
+};
 
-  $: submissions = data.Submissions || [];
-  $: accounts = data.Accounts || [];
-  $: events = data.Events || [];
-  $: lastUpload = data.Stats.LastSubmission ? dateTime(data.Stats.LastSubmission) : "";
+$: submissions = data.Submissions || [];
+$: accounts = data.Accounts || [];
+$: events = data.Events || [];
+$: lastUpload = data.Stats.LastSubmission ? dateTime(data.Stats.LastSubmission) : "";
 
-  const sectionTitle = (active: AdminData["Active"]) => {
-    if (active === "accounts") return "Accounts";
-    if (active === "events") return "Request Logs";
-    return "Submissions";
-  };
+const sectionTitle = (active: AdminData["Active"]) => {
+  if (active === "accounts") return "Accounts";
+  if (active === "events") return "Request Logs";
+  return "Submissions";
+};
 </script>
 
 <main class="admin-screen">
@@ -33,25 +34,25 @@
   <section class="admin-shell">
     <header class="brand-header admin-brand-header">
       <a class="brand-mark admin-brand-mark" href={data.AdminPath}>
-        <img class="brand-logo" src="/project/asset/lt2_logo_text_only.avif" alt="Lemonade Tycoon 2 New York Edition" />
+        <img class="brand-logo" src="/project/asset/lt2_logo_text_only.avif" alt="Lemonade Tycoon 2 New York Edition">
       </a>
       <nav class="admin-nav" aria-label="Admin sections">
         <a class:active-tab={data.Active === "submissions"} class="project-tab" href={`${data.AdminPath}/submissions`}>
           <span>Submissions</span>
-          <img src="/project/asset/lt2_icon_lsx.avif" alt="" />
+          <img src="/project/asset/lt2_icon_lsx.avif" alt="">
         </a>
         <a class:active-tab={data.Active === "accounts"} class="project-tab" href={`${data.AdminPath}/accounts`}>
           <span>Accounts</span>
-          <img src="/project/asset/lt2_icon_play.avif" alt="" />
+          <img src="/project/asset/lt2_icon_play.avif" alt="">
         </a>
         <a class:active-tab={data.Active === "events"} class="project-tab" href={`${data.AdminPath}/events`}>
           <span>Request Logs</span>
-          <img src="/project/asset/lt2_icon_findings.avif" alt="" />
+          <img src="/project/asset/lt2_icon_findings.avif" alt="">
         </a>
         <form method="post" action={`${data.AdminPath}/logout`}>
           <button class="project-tab w-full" type="submit">
             <span>Quit</span>
-            <img src="/project/asset/lt2_lemon_pair.avif" alt="" />
+            <img src="/project/asset/lt2_lemon_pair.avif" alt="">
           </button>
         </form>
       </nav>
@@ -78,10 +79,22 @@
 
       <aside class="admin-sidebar">
         <dl class="admin-stats">
-          <section class="admin-stat"><dt>Submissions</dt><dd>{data.Stats.Submissions}</dd></section>
-          <section class="admin-stat"><dt>Accounts</dt><dd>{data.Stats.Accounts}</dd></section>
-          <section class="admin-stat"><dt>Request logs</dt><dd>{data.Stats.Events}</dd></section>
-          <section class="admin-stat"><dt>Last upload</dt><dd>{lastUpload}</dd></section>
+          <section class="admin-stat">
+            <dt>Submissions</dt>
+            <dd>{data.Stats.Submissions}</dd>
+          </section>
+          <section class="admin-stat">
+            <dt>Accounts</dt>
+            <dd>{data.Stats.Accounts}</dd>
+          </section>
+          <section class="admin-stat">
+            <dt>Request logs</dt>
+            <dd>{data.Stats.Events}</dd>
+          </section>
+          <section class="admin-stat">
+            <dt>Last upload</dt>
+            <dd>{lastUpload}</dd>
+          </section>
         </dl>
       </aside>
     </section>
@@ -89,15 +102,15 @@
 </main>
 
 {#snippet ActionHidden(action: string, back: string)}
-  <input type="hidden" name="csrf" value={data.CSRF} />
-  <input type="hidden" name="action" value={action} />
-  <input type="hidden" name="back" value={back} />
+  <input type="hidden" name="csrf" value={data.CSRF}>
+  <input type="hidden" name="action" value={action}>
+  <input type="hidden" name="back" value={back}>
 {/snippet}
 
 {#snippet DeleteButton(action: string, back: string, id: number)}
   <form class="inline" method="post" action={`${data.AdminPath}/action`}>
     {@render ActionHidden(action, back)}
-    <input type="hidden" name="id" value={id} />
+    <input type="hidden" name="id" value={id}>
     <button class="danger-button" type="submit">Delete</button>
   </form>
 {/snippet}
@@ -107,7 +120,7 @@
     {@render ActionHidden("seed", `${data.AdminPath}/submissions`)}
     <button class="game-button" type="submit">
       <span>Seed recovered Wayback rows</span>
-      <img src="/project/asset/lt2_icon_lsx.avif" alt="" />
+      <img src="/project/asset/lt2_icon_lsx.avif" alt="">
     </button>
   </form>
 
@@ -125,16 +138,18 @@
       <tbody>
         {#each submissions as sub}
           <tr>
-            <td class="whitespace-nowrap">#{sub.ID}<br /><span class="muted">{sub.When}</span><br /><span class="muted">{sub.Remote}</span></td>
-            <td><b>{sub.Row.Company}</b><br />{sub.Row.CEO}<br /><span class="muted">{sub.Host}</span></td>
+            <td class="whitespace-nowrap">
+              #{sub.ID}<br><span class="muted">{sub.When}</span><br><span class="muted">{sub.Remote}</span>
+            </td>
+            <td><b>{sub.Row.Company}</b><br>{sub.Row.CEO}<br><span class="muted">{sub.Host}</span></td>
             <td class="font-black">${money(sub.Row.MarketCents)}</td>
             <td>
               {#if sub.Valid}
                 <b class="valid-state">valid</b>
               {:else}
-                <b class="invalid-state"><img src="/project/asset/warning.avif" alt="" />mismatch</b>
+                <b class="invalid-state"><img src="/project/asset/warning.avif" alt="">mismatch</b>
               {/if}
-              <br /><span class="muted">client {sub.Client}</span><br /><span class="muted">computed {sub.Computed}</span>
+              <br><span class="muted">client {sub.Client}</span><br><span class="muted">computed {sub.Computed}</span>
             </td>
             <td>{@render DeleteButton("delete_submission", `${data.AdminPath}/submissions`, sub.ID)}</td>
           </tr>
@@ -144,12 +159,12 @@
                 <summary>Edit fields</summary>
                 <form class="edit-form" method="post" action={`${data.AdminPath}/action`}>
                   {@render ActionHidden("update_submission", `${data.AdminPath}/submissions`)}
-                  <input type="hidden" name="id" value={sub.ID} />
+                  <input type="hidden" name="id" value={sub.ID}>
                   <fieldset class="field-grid">
                     {#each data.Fields as field}
                       <label>
                         <span>{field}</span>
-                        <input class="admin-input" name={field} value={sub.Fields[field] || ""} />
+                        <input class="admin-input" name={field} value={sub.Fields[field] || ""}>
                       </label>
                     {/each}
                   </fieldset>
@@ -159,7 +174,9 @@
             </td>
           </tr>
         {:else}
-          <tr><td colspan="5">No submissions yet.</td></tr>
+          <tr>
+            <td colspan="5">No submissions yet.</td>
+          </tr>
         {/each}
       </tbody>
     </table>
@@ -192,7 +209,9 @@
             <td>{@render DeleteButton("delete_account", `${data.AdminPath}/accounts`, account.ID)}</td>
           </tr>
         {:else}
-          <tr><td colspan="7">No account probes yet.</td></tr>
+          <tr>
+            <td colspan="7">No account probes yet.</td>
+          </tr>
         {/each}
       </tbody>
     </table>
@@ -245,7 +264,9 @@
             <td>{@render DeleteButton("delete_event", `${data.AdminPath}/events`, event.ID)}</td>
           </tr>
         {:else}
-          <tr><td colspan="8">No request logs yet.</td></tr>
+          <tr>
+            <td colspan="8">No request logs yet.</td>
+          </tr>
         {/each}
       </tbody>
     </table>

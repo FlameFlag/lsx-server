@@ -53,11 +53,13 @@
 
   .project-nav {
     @apply absolute inset-x-11 bottom-2 z-30 flex items-center justify-center gap-7;
+    gap: clamp(0.5rem, 2vw, 1.75rem);
   }
 
   .project-tab,
   .home-screen .project-tab {
     @apply inline-flex min-h-0 min-w-0 items-center gap-2 rounded-none border-0 bg-transparent p-0 font-display text-[38px] font-black normal-case leading-none text-[#4a8422] shadow-none transition hover:translate-y-0 hover:bg-transparent;
+    font-size: clamp(1.75rem, 3.1vw, 2.375rem);
     text-shadow:
       0 1px 0 rgba(255, 255, 255, 0.72),
       0 2px 1px rgba(49, 95, 20, 0.24);
@@ -76,6 +78,8 @@
   .project-tab img,
   .project-tab > span:last-child:not(:first-child) {
     @apply mt-0 grid h-14 w-14 place-items-center rounded-full border-2 border-[#bfff76] object-contain shadow-[inset_0_2px_0_rgba(255,255,255,.8),0_3px_5px_rgba(24,94,13,.45)];
+    height: clamp(2.75rem, 4.6vw, 3.5rem);
+    width: clamp(2.75rem, 4.6vw, 3.5rem);
     background: radial-gradient(circle at 35% 28%, #f2ffd4 0 18%, #8ee022 42%, #25a61d 76%);
   }
 
@@ -325,6 +329,13 @@
     background-size: cover;
     background-repeat: no-repeat;
     background-position: center center;
+  }
+
+  .project-screen:not(.home-screen) .screen-map,
+  .project-screen:not(.home-screen) .screen-wash {
+    @apply fixed;
+    min-height: 100vh;
+    height: 100vh;
   }
 
   .project-screen:not(.home-screen) .screen-wash {

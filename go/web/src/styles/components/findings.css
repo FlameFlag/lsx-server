@@ -1,6 +1,10 @@
 @layer components {
   .findings-root {
     @apply text-lsx-ink;
+    box-sizing: border-box;
+    width: 100%;
+    max-width: 860px;
+    margin-inline: auto;
   }
 
   .findings-root h2 {
@@ -24,7 +28,7 @@
   }
 
   .findings-hero {
-    @apply rounded-lg border-2 border-lsx-field bg-lsx-cream p-4;
+    @apply overflow-x-auto rounded-lg border-2 border-lsx-field bg-lsx-cream p-4;
   }
 
   .findings-kicker,
@@ -40,12 +44,16 @@
     @apply rounded-md bg-white px-3 py-2 text-sm no-underline hover:bg-[#fff8b9];
   }
 
+  .findings-markdown {
+    @apply overflow-x-auto pb-2;
+  }
+
   .findings-root table {
     @apply mt-4 w-full min-w-170 border-collapse bg-white text-sm;
   }
 
   .findings-root table {
-    @apply mt-4 overflow-x-auto rounded-lg border-2 border-lsx-border;
+    @apply mt-4 rounded-lg border-2 border-lsx-border;
   }
 
   .findings-root th {

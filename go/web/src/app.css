@@ -8,6 +8,7 @@
 @import "./styles/components/foundation.css";
 @import "./styles/components/home.css";
 @import "./styles/components/docs.css";
+@import "./styles/components/activate.css";
 @import "./styles/components/login.css";
 @import "./styles/components/admin.css";
 @import "./styles/components/findings.css";

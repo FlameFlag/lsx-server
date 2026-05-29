@@ -1,4 +1,4 @@
-export type PageKind = "home" | "findings" | "docs" | "admin-login" | "admin";
+export type PageKind = "home" | "findings" | "docs" | "activate" | "admin-login" | "admin";
 
 export type BoardRow = {
   Rank: number;
@@ -12,6 +12,7 @@ export type ProjectData = {
   boardRows?: BoardRow[];
   boardTotal?: number;
   markdown?: string;
+  serverAddr?: string;
 };
 
 export type AdminStats = {

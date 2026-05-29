@@ -1,11 +1,11 @@
 <script lang="ts">
-  import ProjectShell from "./ProjectShell.svelte";
-  import type { ProjectData } from "../types";
+import type { ProjectData } from "../types";
+import ProjectShell from "./ProjectShell.svelte";
 
-  export let data: ProjectData;
+export let data: ProjectData;
 
-  $: rows = data.boardRows || [];
-  $: total = data.boardTotal || 0;
+$: rows = data.boardRows || [];
+$: total = data.boardTotal || 0;
 </script>
 
 <ProjectShell active="home" heading={data.heading || "LSX"}>
@@ -13,7 +13,7 @@
     <article class="leaderboard-card">
       <header class="card-header">
         <figure class="brand-lockup">
-          <img src="/project/asset/lt2_icon_lsx.avif" alt="" />
+          <img src="/project/asset/lt2_icon_lsx.avif" alt="">
           <figcaption>
             <p class="eyebrow">Market Open</p>
             <h2 class="compact-heading">Lemonade Stock Exchange</h2>
@@ -23,7 +23,9 @@
 
       <p class="leaderboard-summary">
         {#if total}
-          {total} LSX submission{total === 1 ? "" : "s"} currently ranked.
+          {total}
+          LSX submission{total === 1 ? "" : "s"}
+          currently ranked.
         {:else}
           No LSX submissions have been received yet.
         {/if}
@@ -56,7 +58,7 @@
     <aside class="side-stack">
       <a class="game-button" href="/board">
         <span>Open LSX Board</span>
-        <img src="/project/asset/lt2_icon_lsx.avif" alt="" />
+        <img src="/project/asset/lt2_icon_lsx.avif" alt="">
       </a>
 
       <section class="admin-card sort-card">
@@ -73,21 +75,21 @@
 
   <footer class="credits-bar">
     <h2 class="credit-title">
-      <img class="h-14 w-14" src="/project/asset/lt2_asset_credits.avif" alt="" />
+      <img class="h-14 w-14" src="/project/asset/lt2_asset_credits.avif" alt="">
       <span>Credits</span>
     </h2>
     <nav class="credit-list" aria-label="Project credits">
       <a class="credit-link" href="https://github.com/FlameFlag">
-        <img src="/project/asset/flameflag_lemon.png" alt="" />
+        <img src="/project/asset/flameflag_lemon.png" alt="">
         <span><b>Revival</b> FlameFlag</span>
       </a>
       <a class="credit-link" href="https://github.com/TiZmSpectrum">
-        <img src="/project/asset/timz_lemon.png" alt="" />
+        <img src="/project/asset/timz_lemon.png" alt="">
         <span><b>Idea & Domain</b> TiZmSpectrum</span>
       </a>
     </nav>
     <a class="source-link" href="https://github.com/FlameFlag/lsx-server">
-      <img src="/project/asset/lt2_asset_github.avif" alt="" />
+      <img src="/project/asset/lt2_asset_github.avif" alt="">
       Source
     </a>
   </footer>
