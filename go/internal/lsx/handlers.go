@@ -31,6 +31,10 @@ func (s *Server) Routes() http.Handler {
 	router := chi.NewRouter()
 	s.mountRoutes(router)
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if isArmadilloRequest(r) {
+			s.handleActivate(w, r)
+			return
+		}
 		if shouldForceLegacyLeaderboard(r) {
 			r = r.WithContext(context.WithValue(r.Context(), forcedLegacyLeaderboardKey, true))
 			s.handleLeaderboard(w, r)
@@ -45,7 +49,11 @@ func (s *Server) Routes() http.Handler {
 }
 
 func (s *Server) mountRoutes(router chi.Router) {
+	// Armadillo DRM activation catches any POST with SOAP/XML before other routes.
+	router.HandleFunc("/activate", s.withServer((*Server).handleActivate))
+
 	router.HandleFunc("/api/v1/leaderboard", s.withServer((*Server).handleAPILeaderboard))
+	router.HandleFunc("/api/v1/keygen", s.withServer((*Server).handleAPIKeygen))
 	router.HandleFunc("/project/asset/*", s.withServer((*Server).handleProjectAsset))
 	router.HandleFunc("/board", s.withServer((*Server).handleLeaderboard))
 	router.HandleFunc("/leaderboard", s.withServer((*Server).handleLeaderboard))
@@ -66,13 +74,21 @@ func (s *Server) mountRoutes(router chi.Router) {
 	router.HandleFunc("/img/lsx2/connection.gif", s.withServer((*Server).handleConnectionGIF))
 	router.HandleFunc("/healthz", s.withServer((*Server).handleHealthz))
 	router.HandleFunc("/favicon.ico", s.withServer((*Server).handleFavicon))
-	router.NotFound(s.handleNotFound)
+	router.NotFound(s.handleArmadilloOrNotFound)
 }
 
 func (s *Server) withServer(handler routeHandler) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		handler(s, w, r)
 	}
+}
+
+func (s *Server) handleArmadilloOrNotFound(w http.ResponseWriter, r *http.Request) {
+	if isArmadilloRequest(r) {
+		s.handleActivate(w, r)
+		return
+	}
+	s.handleNotFound(w, r)
 }
 
 func (s *Server) handleNotFound(w http.ResponseWriter, r *http.Request) {

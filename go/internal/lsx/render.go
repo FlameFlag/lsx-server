@@ -66,6 +66,7 @@ type svelteProjectPage struct {
 	BoardRows  []projectLeaderboardRow `json:"boardRows,omitempty"`
 	BoardTotal int                     `json:"boardTotal,omitempty"`
 	Markdown   string                  `json:"markdown,omitempty"`
+	ServerAddr string                  `json:"serverAddr,omitempty"`
 }
 
 type svelteAppPage struct {
@@ -136,6 +137,18 @@ func (s *Server) handleDocsPage(w http.ResponseWriter, r *http.Request) {
 	})
 }
 
+func (s *Server) handleActivatePage(w http.ResponseWriter, r *http.Request) {
+	host := r.Host
+	if colon := strings.LastIndex(host, ":"); colon >= 0 {
+		host = host[:colon]
+	}
+	s.renderSvelteApp(w, r, "activate", "LT2 Activation Guide", "activate-page", svelteProjectPage{
+		Title:      "LT2 Activation Guide",
+		Heading:    "Activation Guide",
+		ServerAddr: host,
+	})
+}
+
 func (s *Server) renderSvelteApp(w http.ResponseWriter, r *http.Request, page string, title string, bodyClass string, data any) {
 	styles, scripts, err := svelteAppAssets()
 	if err != nil {
@@ -172,6 +185,8 @@ func (s *Server) renderSvelteApp(w http.ResponseWriter, r *http.Request, page st
 		s.emit(r, "findings", http.StatusOK, "rendered findings page")
 	case "docs":
 		s.emit(r, "docs", http.StatusOK, "rendered docs page")
+	case "activate":
+		s.emit(r, "activate", http.StatusOK, "rendered activate page")
 	case "admin", "admin-login":
 		s.emit(r, "admin", http.StatusOK, "rendered admin page")
 	default:

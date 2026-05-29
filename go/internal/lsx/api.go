@@ -10,6 +10,7 @@ import (
 	"strconv"
 
 	"lt2_reverse/lsx_server_go/internal/eventpath"
+	"lt2_reverse/lsx_server_go/internal/lsx/keygen"
 )
 
 const (
@@ -230,6 +231,39 @@ func writeJSON(w http.ResponseWriter, r *http.Request, status int, payload any) 
 		return
 	}
 	_ = json.NewEncoder(w).Encode(payload)
+}
+
+type apiKeygenResponse struct {
+	RegistrationName string `json:"registration_name"`
+	ActivationKey    string `json:"activation_key"`
+	KeyFormat        string `json:"key_format"`
+	Note             string `json:"note"`
+}
+
+func (s *Server) handleAPIKeygen(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodGet && r.Method != http.MethodHead {
+		w.Header().Set("Allow", "GET, HEAD")
+		writeAPIProblem(w, r, http.StatusMethodNotAllowed, "Method Not Allowed", "use GET for this endpoint")
+		return
+	}
+
+	pair, err := keygen.Generate(r.URL.Query().Get("name"))
+	if err != nil {
+		writeAPIProblem(w, r, http.StatusBadRequest, "Key Generation Failed", err.Error())
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	w.Header().Set("Cache-Control", "no-store")
+	if r.Method == http.MethodHead {
+		return
+	}
+	_ = json.NewEncoder(w).Encode(apiKeygenResponse{
+		RegistrationName: pair.RegistrationName,
+		ActivationKey:    pair.ActivationKey,
+		KeyFormat:        pair.Format,
+		Note:             "Naturally-valid Armadillo ShortV3 signed key. The key is bound to the registration name: use this exact name/key pair in Lemonade2.exe REGISTER.",
+	})
 }
 
 func writeAPIProblem(w http.ResponseWriter, r *http.Request, status int, title string, detail string) {

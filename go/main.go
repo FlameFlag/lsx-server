@@ -18,12 +18,12 @@ var version = "dev"
 func main() {
 	configureLogger()
 	if err := loadDotEnv(); err != nil {
-		fmt.Fprintf(os.Stderr, "failed to load .env: %v\n", err)
+		_, _ = fmt.Fprintf(os.Stderr, "failed to load .env: %v\n", err)
 		os.Exit(1)
 	}
 	cmd, err := newRootCommand()
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "invalid environment configuration: %v\n", err)
+		_, _ = fmt.Fprintf(os.Stderr, "invalid environment configuration: %v\n", err)
 		os.Exit(1)
 	}
 	displayVersion := envString("LSX_VERSION", version)
@@ -33,11 +33,14 @@ func main() {
 }
 
 func loadDotEnv() error {
-	err := godotenv.Load()
-	if errors.Is(err, os.ErrNotExist) {
-		return nil
+	for _, path := range []string{".env", "../.env"} {
+		err := godotenv.Load(path)
+		if errors.Is(err, os.ErrNotExist) {
+			continue
+		}
+		return err
 	}
-	return err
+	return nil
 }
 
 func newRootCommand() (*cobra.Command, error) {
