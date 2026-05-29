@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="web/static/project/lt2_logo_text_only.avif" alt="Lemonade Tycoon 2 New York Edition" width="520">
+  <img src="go/web/static/project/lt2_logo_text_only.avif" alt="Lemonade Tycoon 2 New York Edition" width="520">
 </p>
 
 <h1 align="center">LSX Server</h1>
@@ -31,19 +31,19 @@ It keeps the preservation work close to the running service. The server stores u
   </tr>
   <tr>
     <td width="25%" align="center">
-      <img src="web/static/project/lt2_icon_play.avif" alt="" width="96"><br>
+      <img src="go/web/static/project/lt2_icon_play.avif" alt="" width="96"><br>
       Recreates the endpoints and tiny assets the recovered game client expects.
     </td>
     <td width="25%" align="center">
-      <img src="web/static/project/lt2_icon_lsx.avif" alt="" width="96"><br>
+      <img src="go/web/static/project/lt2_icon_lsx.avif" alt="" width="96"><br>
       Serves recovered LSX pages and stores fresh score uploads in SQLite.
     </td>
     <td width="25%" align="center">
-      <img src="web/static/project/lt2_icon_findings.avif" alt="" width="96"><br>
+      <img src="go/web/static/project/lt2_icon_findings.avif" alt="" width="96"><br>
       Documents the protocol, checksum, date scalar, upload queue, and page shape.
     </td>
     <td width="25%" align="center">
-      <img src="web/static/admin/pitcher.avif" alt="" width="96"><br>
+      <img src="go/web/static/admin/pitcher.avif" alt="" width="96"><br>
       Provides admin cleanup, a live TUI, and Discord sync alerts.
     </td>
   </tr>
@@ -54,6 +54,7 @@ It keeps the preservation work close to the running service. The server stores u
 ```sh
 git clone https://github.com/FlameFlag/lsx_server_go.git
 cd lsx_server_go
+cd go
 go run . --addr 127.0.0.1:8080
 ```
 
@@ -62,7 +63,7 @@ Open `http://127.0.0.1:8080/`.
 Configuration can also come from environment variables. On startup, the server loads a local `.env` file when one exists, then command-line flags override those values.
 
 ```sh
-cp .env.example .env
+cp ../.env.example ../.env
 LSX_ADDR=127.0.0.1:8080 go run .
 ```
 
@@ -155,7 +156,7 @@ Compatibility notes:
 
 The server exposes a small read-only JSON API for integrations that need leaderboard data without scraping the recovered HTML pages. The API uses the same ranking rules as `/board`.
 
-The contract is documented in [openapi.yaml](openapi.yaml). Routing uses `github.com/go-chi/chi/v5`, a pure Go `net/http` router with no CGO dependency.
+The contract is documented in [go/openapi.yaml](go/openapi.yaml). Routing uses `github.com/go-chi/chi/v5`, a pure Go `net/http` router with no CGO dependency.
 
 ### `GET /api/v1/leaderboard`
 
@@ -226,6 +227,25 @@ Errors use `application/problem+json`:
 
 Unsupported methods return `405 Method Not Allowed` with `Allow: GET, HEAD`.
 
+## Recovered Activation Key Proof
+
+The repo includes a reproducible recovery path for the Armadillo ShortV3 key
+material used by `/api/v1/keygen`:
+
+```sh
+nix develop -c make recover-shortv3
+```
+
+That derives the mapper seed and validation seed from the packed game, then uses
+Sage to recover the ShortV3 private exponent from the embedded public
+certificate and verifies the result.
+
+## Documentation
+
+Project docs are centralized under [docs/](docs/). Start with
+[docs/README.md](docs/README.md) for the tool reference and current
+reverse-engineering notes.
+
 ## Operations
 
 ### Admin
@@ -256,7 +276,7 @@ Default events: `sync`, `sync_rejected`, `sync_error`, `account`, `account_error
 <table>
   <tr>
     <td width="120" align="center">
-      <img src="web/static/project/lt2_asset_credits.avif" alt="" width="96">
+      <img src="go/web/static/project/lt2_asset_credits.avif" alt="" width="96">
     </td>
     <td>
       <ul>
