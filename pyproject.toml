@@ -1,0 +1,19 @@
+[project]
+name = "lsx-server-workspace"
+version = "0.1.0"
+requires-python = ">=3.11"
+dependencies = []
+
+[tool.uv]
+package = false
+
+[tool.uv.workspace]
+members = [
+  "decompiled/analysis/lemonade2_static_unpacking",
+]
+
+[tool.ty.environment]
+python = "./.venv"
+root = [
+  "./decompiled/analysis/lemonade2_static_unpacking",
+]

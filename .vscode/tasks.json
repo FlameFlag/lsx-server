@@ -131,6 +131,22 @@
       }
     },
     {
+      "label": "c: build lt2rb",
+      "type": "shell",
+      "command": "./build.sh",
+      "options": {
+        "cwd": "${workspaceFolder}/go/tools/rbdecompress/c"
+      },
+      "group": "build",
+      "problemMatcher": [
+        "$gcc"
+      ],
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared"
+      }
+    },
+    {
       "label": "docker: compose up",
       "type": "process",
       "command": "docker",

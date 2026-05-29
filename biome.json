@@ -9,11 +9,14 @@
     "includes": [
       "biome.json",
       "package.json",
-      "web/package.json",
-      "web/svelte.config.js",
-      "web/vite.config.ts",
-      "web/src/**/*.css",
-      "web/src/**/*.ts"
+      "go/web/package.json",
+      "go/web/index.html",
+      "go/web/svelte.config.js",
+      "go/web/vite.config.ts",
+      "go/web/src/**/*.svelte",
+      "go/web/src/**/*.css",
+      "go/web/src/**/*.ts",
+      "!go/web/src/openapi-types.ts"
     ]
   },
   "formatter": {

@@ -54,6 +54,20 @@ coverage.out
 coverage.html
 *.coverprofile
 
+# SwiftPM and Xcode generated output
+.build/
+.swiftpm/
+DerivedData/
+xcuserdata/
+*.xcuserstate
+*.xcscmblueprint
+
+# Python cache files
+/.venv/
+__pycache__/
+*.py[cod]
+*$py.class
+
 # Server binaries built on macOS/Linux/Windows
 /lsx_server_go
 /lsx_server_go.exe
@@ -64,6 +78,7 @@ coverage.html
 *.a
 *.o
 *.obj
+compile_commands.json
 *.lib
 *.pdb
 *.ilk
@@ -73,7 +88,7 @@ core
 core.*
 
 # Databases and generated data
-data/
+/data/
 *.sqlite
 *.sqlite3
 *.sqlite3-*
@@ -82,9 +97,31 @@ data/
 *.csv
 *.tsv
 
+# Lemonade Tycoon 2 reverse-engineering outputs
+Lemonade2.rb
+lemonade2_rb.bz2
+teneon_ie_release.bz2
+/decompiled/*_unpacked.bin
+lt2-images/
+rb-images/
+extracted-images/
+/bitmap_[0-9][0-9][0-9]_*.png
+
+# Local reverse-engineering workspace for bulky/private files.
+# Keep Ghidra projects, installer EXEs, process dumps, and rebuilt unpacked
+# binaries here instead of in tracked source directories.
+/decompiled/local/
+/decompiled/lt2_install/
+/decompiled/lt2_normalized/
+
+# Ghidra local project databases
+*.gpr
+*.gpr.lock
+*.rep/
+
 # Frontend dependencies and local tool caches
 node_modules/
-web/node_modules/
-web/dist/
-web/.vite/
-web/.svelte-kit/
+go/web/node_modules/
+go/web/dist/
+go/web/.vite/
+go/web/.svelte-kit/

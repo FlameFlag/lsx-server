@@ -2,12 +2,12 @@
   "name": "lsx-server",
   "private": true,
   "workspaces": [
-    "web"
+    "go/web"
   ],
   "scripts": {
-    "build": "npm --prefix web run build",
-    "check": "npm --prefix web run check && npm run lint",
-    "dev": "npm --prefix web run dev",
+    "build": "npm --prefix go/web run build",
+    "check": "npm --prefix go/web run check && npm run lint",
+    "dev": "npm --prefix go/web run dev",
     "fallow": "fallow",
     "fallow:audit": "fallow audit --format json --quiet --explain",
     "fallow:dead-code": "fallow dead-code",
@@ -16,8 +16,8 @@
     "fallow:health": "fallow health",
     "fallow:list": "fallow list --entry-points --files --plugins --workspaces",
     "format": "npm run format:tailwind && npm run format:web && npm run format:go",
-    "format:go": "gofmt -w $(find . -name '*.go' -not -path './vendor/*')",
-    "format:tailwind": "cd web && tailwind-suggest-canonical-classes \"src/**/*.{svelte,ts,css}\" --css src/app.css",
+    "format:go": "gofmt -w $(find go -name '*.go' -not -path '*/vendor/*')",
+    "format:tailwind": "cd go/web && tailwind-suggest-canonical-classes \"src/**/*.{svelte,ts,css}\" --css src/app.css",
     "format:web": "biome check --write",
     "lint": "biome ci"
   },

@@ -2,18 +2,18 @@
 
 FROM golang:1.26-alpine AS build
 
-WORKDIR /src
+WORKDIR /src/go
 
-COPY go.mod go.sum ./
+COPY go/go.mod go/go.sum ./
 RUN --mount=type=cache,target=/go/pkg/mod \
     go mod download
 
-COPY . .
+COPY go ./
 
 ARG VERSION=dev
 RUN --mount=type=cache,target=/go/pkg/mod \
     --mount=type=cache,target=/root/.cache/go-build \
-    CGO_ENABLED=0 go build -trimpath -ldflags="-s -w -X main.version=${VERSION}" -o /out/lsx-server .
+    CGO_ENABLED=0 go build -trimpath -tags webdist -ldflags="-s -w -X main.version=${VERSION}" -o /out/lsx-server .
 
 FROM alpine:3.22.4
 

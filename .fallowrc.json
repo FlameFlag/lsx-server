@@ -1,19 +1,19 @@
 {
   "$schema": "https://raw.githubusercontent.com/fallow-rs/fallow/main/schema.json",
-  "entry": ["web/src/main.ts"],
+  "entry": ["go/web/src/main.ts"],
   "workspaces": {
-    "patterns": ["web"]
+    "patterns": ["go/web"]
   },
-  "ignorePatterns": ["assets/**/*.css", "assets/project/svelte/**", "web/node_modules/**", "web/static/legacy/*.css"],
-  "dynamicallyLoaded": ["web/svelte.config.js"],
+  "ignorePatterns": ["assets/**/*.css", "assets/project/svelte/**", "go/web/node_modules/**", "go/web/static/legacy/*.css"],
+  "dynamicallyLoaded": ["go/web/svelte.config.js"],
   "ignoreExportsUsedInFile": true,
   "ignoreExports": [
-    { "file": "web/src/App.svelte", "exports": ["*"] },
-    { "file": "web/src/components/AdminDashboard.svelte", "exports": ["*"] },
-    { "file": "web/src/components/AdminLogin.svelte", "exports": ["*"] },
-    { "file": "web/src/components/DocsPage.svelte", "exports": ["*"] },
-    { "file": "web/src/components/FindingsPage.svelte", "exports": ["*"] },
-    { "file": "web/src/components/HomePage.svelte", "exports": ["*"] }
+    { "file": "go/web/src/App.svelte", "exports": ["*"] },
+    { "file": "go/web/src/components/AdminDashboard.svelte", "exports": ["*"] },
+    { "file": "go/web/src/components/AdminLogin.svelte", "exports": ["*"] },
+    { "file": "go/web/src/components/DocsPage.svelte", "exports": ["*"] },
+    { "file": "go/web/src/components/FindingsPage.svelte", "exports": ["*"] },
+    { "file": "go/web/src/components/HomePage.svelte", "exports": ["*"] }
   ],
   "rules": {
     "unused-files": "warn",

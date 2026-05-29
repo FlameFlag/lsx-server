@@ -3,6 +3,7 @@
     "golang.go",
     "redhat.vscode-yaml",
     "jnoortheen.nix-ide",
+    "ms-vscode.cpptools",
     "ms-azuretools.vscode-containers",
     "spmeesseman.vscode-taskexplorer",
     "ms-vscode.powershell",
