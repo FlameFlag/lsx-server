@@ -1,0 +1,61 @@
+plugins {
+	id 'java'
+}
+
+def detectedGhidra = System.getenv('GHIDRA_INSTALL_DIR')
+if (detectedGhidra == null || detectedGhidra.isBlank()) {
+	def headless = providers.exec {
+		commandLine 'sh', '-c', 'command -v ghidra-analyzeHeadless || true'
+	}.standardOutput.asText.get().trim()
+	if (!headless.isBlank()) {
+		detectedGhidra = file(headless).canonicalFile.parentFile.parentFile.path
+	}
+}
+
+if (detectedGhidra == null || detectedGhidra.isBlank()) {
+	throw new GradleException('Set GHIDRA_INSTALL_DIR or put ghidra-analyzeHeadless on PATH')
+}
+
+ext.ghidraInstallDir = file(detectedGhidra).canonicalFile
+ext.ghidraDir = file("${ghidraInstallDir}/Ghidra")
+
+java {
+	toolchain {
+		languageVersion = JavaLanguageVersion.of(21)
+	}
+}
+
+sourceSets {
+	main {
+		java {
+			srcDirs = ['src/main/java']
+		}
+	}
+}
+
+repositories {
+	mavenCentral()
+}
+
+dependencies {
+	// Ghidra 12 ships Apache Commons Lang/Text/IO, Guava, Gson, and other
+	// utility jars under Framework/Generic/lib.  Keep using those bundled
+	// versions so headless scripts compile and run on Ghidra's own classpath.
+	compileOnly fileTree(dir: "${ghidraDir}/Framework", include: '**/*.jar')
+	compileOnly fileTree(dir: "${ghidraDir}/Features", include: '**/*.jar')
+	compileOnly fileTree(dir: "${ghidraDir}/Debug", include: '**/*.jar')
+	compileOnly fileTree(dir: "${ghidraDir}/Processors", include: '**/*.jar')
+	compileOnly files("${ghidraInstallDir}/support/LaunchSupport.jar")
+}
+
+tasks.withType(JavaCompile).configureEach {
+	options.encoding = 'UTF-8'
+	options.release = 21
+	options.compilerArgs += ['-Xlint:deprecation', '-Xlint:unchecked']
+}
+
+tasks.register('printGhidraClasspath') {
+	doLast {
+		println sourceSets.main.compileClasspath.asPath
+	}
+}
