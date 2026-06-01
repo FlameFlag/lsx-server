@@ -1,4 +1,5 @@
-#!/usr/bin/env bash
+#!/usr/bin/env nix-shell
+#! nix-shell -i bash -p bash coreutils go_1_26 sage
 set -euo pipefail
 
 script_dir="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
@@ -24,10 +25,7 @@ if ! command -v sage >/dev/null 2>&1; then
   cat >&2 <<'EOF'
 Sage is required for the full independent discrete-log recovery.
 
-Run this from a Nix-enabled checkout:
-  nix develop -c make recover-shortv3
-
-Or install Sage separately and rerun:
+Install Sage separately and rerun:
   make recover-shortv3
 EOF
   exit 127

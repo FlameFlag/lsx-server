@@ -1,4 +1,5 @@
-#!/usr/bin/env bash
+#!/usr/bin/env nix-shell
+#! nix-shell -i bash -p bash coreutils findutils jdk21_headless
 set -euo pipefail
 
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
@@ -16,8 +17,6 @@ fi
 
 JAVA_HOME_CANDIDATES=(
 	"${JAVA_HOME:-}"
-	"/nix/store/bp2gjhd8vfyv2hg0i90sba2wp47vvflg-zulu-ca-jdk-21.0.11/Library/Java/JavaVirtualMachines/zulu-21.jdk/Contents/Home"
-	"/nix/store/vnycnlns50zkb0pns9rd7vhpv3m0fxc4-zulu-ca-jdk-21.0.8/Library/Java/JavaVirtualMachines/zulu-21.jdk/Contents/Home"
 )
 
 JAVAC=""

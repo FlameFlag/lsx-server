@@ -1,4 +1,5 @@
-#!/usr/bin/env bash
+#!/usr/bin/env nix-shell
+#! nix-shell -i bash -p bash coreutils gnused openssh sshpass python3 uv
 # shellcheck shell=bash
 set -euo pipefail
 
