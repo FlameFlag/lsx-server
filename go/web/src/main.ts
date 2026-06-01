@@ -1,5 +1,5 @@
 import "./app.css";
-import { mount, type Component } from "svelte";
+import { type Component, mount } from "svelte";
 import type { PageKind } from "./types";
 
 const target = document.getElementById("app");
@@ -23,10 +23,14 @@ mount(PageComponent, {
 });
 
 async function componentFor(page: PageKind): Promise<Component<{ data: unknown }>> {
-  if (page === "admin") return (await import("./components/AdminDashboard.svelte")).default as Component<{ data: unknown }>;
-  if (page === "admin-login") return (await import("./components/AdminLogin.svelte")).default as Component<{ data: unknown }>;
-  if (page === "findings") return (await import("./components/FindingsPage.svelte")).default as Component<{ data: unknown }>;
-  if (page === "activate") return (await import("./components/ActivatePage.svelte")).default as Component<{ data: unknown }>;
+  if (page === "admin")
+    return (await import("./components/AdminDashboard.svelte")).default as Component<{ data: unknown }>;
+  if (page === "admin-login")
+    return (await import("./components/AdminLogin.svelte")).default as Component<{ data: unknown }>;
+  if (page === "findings")
+    return (await import("./components/FindingsPage.svelte")).default as Component<{ data: unknown }>;
+  if (page === "activate")
+    return (await import("./components/ActivatePage.svelte")).default as Component<{ data: unknown }>;
   if (page === "docs") return (await import("./components/DocsPage.svelte")).default as Component<{ data: unknown }>;
   return (await import("./components/HomePage.svelte")).default as Component<{ data: unknown }>;
 }

@@ -25,5 +25,8 @@
     "@biomejs/biome": "2.4.16",
     "@laststance/tailwind-suggest-canonical-classes": "^0.1.1",
     "fallow": "2.84.0"
+  },
+  "overrides": {
+    "postcss": "8.5.15"
   }
 }
