@@ -47,7 +47,7 @@ func run(args []string) int {
 	jsonOutput := fs.Bool("json", false, "write JSON output")
 	uiMode := fs.String("ui", "cli", "interface to launch: cli, auto, gtk, swiftui, or windows")
 	fs.Usage = func() {
-		fmt.Fprintf(fs.Output(), "Usage: %s [flags] [registration-name]\n", fs.Name())
+		_, _ = fmt.Fprintf(fs.Output(), "Usage: %s [flags] [registration-name]\n", fs.Name())
 		fs.PrintDefaults()
 	}
 

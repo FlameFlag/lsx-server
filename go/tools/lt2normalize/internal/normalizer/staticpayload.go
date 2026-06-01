@@ -108,11 +108,12 @@ func deriveStaticPayload(packedPath, outputPath string, mode staticPayloadMode) 
 		})
 	}
 	var portablePatches portablePatchSummary
-	if mode == staticPayloadModeCanonical {
+	switch mode {
+	case staticPayloadModeCanonical:
 		if err := canonicalizeStaticPayload(payload); err != nil {
 			return staticPayloadInfo{}, err
 		}
-	} else if mode == staticPayloadModePortable {
+	case staticPayloadModePortable:
 		summary, err := portableCanonicalizeStaticPayload(payload)
 		if err != nil {
 			return staticPayloadInfo{}, err
@@ -233,11 +234,15 @@ func generatedAuxXOR(data []byte, aux []byte) {
 	}
 }
 
-func zlibInflate(data []byte) ([]byte, error) {
+func zlibInflate(data []byte) (out []byte, err error) {
 	reader, err := zlib.NewReader(bytes.NewReader(data))
 	if err != nil {
 		return nil, err
 	}
-	defer reader.Close()
+	defer func() {
+		if closeErr := reader.Close(); err == nil && closeErr != nil {
+			err = closeErr
+		}
+	}()
 	return io.ReadAll(reader)
 }

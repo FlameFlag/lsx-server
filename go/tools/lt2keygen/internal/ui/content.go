@@ -1,3 +1,5 @@
+//go:build gtk || (windows && windigo)
+
 package ui
 
 const appTitle = "Lemonade Tycoon 2: New York Edition Keygen"
