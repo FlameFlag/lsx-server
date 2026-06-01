@@ -3,6 +3,7 @@ package normalizer
 import (
 	"bytes"
 	"encoding/binary"
+	"errors"
 	"fmt"
 	"os"
 )
@@ -78,19 +79,19 @@ func patchSectionRawRange(peData []byte, sectionName string, rawOffset uint32, r
 
 func sectionHeaderOffset(peData []byte, sectionName string) (int, error) {
 	if len(peData) < 0x40 || !bytes.Equal(peData[:2], []byte("MZ")) {
-		return 0, fmt.Errorf("not a PE/MZ file")
+		return 0, errors.New("not a PE/MZ file")
 	}
 	peOffset := int(binary.LittleEndian.Uint32(peData[0x3C:0x40]))
 	if peOffset < 0 || peOffset+24 > len(peData) || !bytes.Equal(peData[peOffset:peOffset+4], []byte("PE\x00\x00")) {
-		return 0, fmt.Errorf("invalid PE header")
+		return 0, errors.New("invalid PE header")
 	}
 	sectionCount := int(binary.LittleEndian.Uint16(peData[peOffset+6 : peOffset+8]))
 	optionalSize := int(binary.LittleEndian.Uint16(peData[peOffset+20 : peOffset+22]))
 	sectionTable := peOffset + 24 + optionalSize
-	for i := 0; i < sectionCount; i++ {
+	for i := range sectionCount {
 		offset := sectionTable + i*40
 		if offset+40 > len(peData) {
-			return 0, fmt.Errorf("section table extends beyond file")
+			return 0, errors.New("section table extends beyond file")
 		}
 		name := string(bytes.TrimRight(peData[offset:offset+8], "\x00"))
 		if name == sectionName {

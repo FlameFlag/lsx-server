@@ -3,6 +3,7 @@ package normalizer
 import (
 	"bytes"
 	"encoding/binary"
+	"errors"
 	"fmt"
 	"os"
 	"path/filepath"
@@ -469,7 +470,7 @@ func resourceDataRVAsAndTypes(peBytes []byte, resourceRVA uint32) ([]uint32, map
 	sectionCount := int(binary.LittleEndian.Uint16(peBytes[peOffset+6 : peOffset+8]))
 	var resourceRaw uint32
 	var resourceRawSize uint32
-	for index := 0; index < sectionCount; index++ {
+	for index := range sectionCount {
 		header := sectionTable + index*40
 		sectionRVA := binary.LittleEndian.Uint32(peBytes[header+12 : header+16])
 		if sectionRVA != resourceRVA {
@@ -480,7 +481,7 @@ func resourceDataRVAsAndTypes(peBytes []byte, resourceRVA uint32) ([]uint32, map
 		break
 	}
 	if resourceRaw == 0 || int(resourceRaw+resourceRawSize) > len(peBytes) {
-		return nil, nil, fmt.Errorf("resource section raw range is invalid")
+		return nil, nil, errors.New("resource section raw range is invalid")
 	}
 	resource := peBytes[resourceRaw : resourceRaw+resourceRawSize]
 	types := map[uint16]bool{}
@@ -500,7 +501,7 @@ func resourceDataRVAsAndTypes(peBytes []byte, resourceRVA uint32) ([]uint32, map
 		if entriesOffset > uint32(len(resource)) || uint32(len(resource))-entriesOffset < uint32(entryCount*8) {
 			return fmt.Errorf("directory entries at 0x%X exceed section", entriesOffset)
 		}
-		for index := 0; index < entryCount; index++ {
+		for index := range entryCount {
 			entryOffset := entriesOffset + uint32(index*8)
 			name := binary.LittleEndian.Uint32(resource[entryOffset : entryOffset+4])
 			value := binary.LittleEndian.Uint32(resource[entryOffset+4 : entryOffset+8])

@@ -204,7 +204,7 @@ func inflateStaticPayloadEntry(stream []byte, entry mapperPayloadEntry, seed uin
 func generatedPayloadAuxTable(seed uint32) []byte {
 	aux := make([]byte, 0x1004)
 	aux[0] = 0x20
-	for offset := 0; offset < 0x1000; offset++ {
+	for offset := range 0x1000 {
 		aux[2+offset] = byte(generatedPRNGNext(&seed))
 	}
 	aux[0x1002] = byte(generatedPRNGNext(&seed))

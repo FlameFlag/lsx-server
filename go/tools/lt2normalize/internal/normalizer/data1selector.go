@@ -4,6 +4,7 @@ import (
 	"crypto/sha256"
 	"encoding/binary"
 	"encoding/hex"
+	"errors"
 	"fmt"
 	"os"
 )
@@ -85,7 +86,7 @@ func findBestData1Selector(data1 []byte) (data1SelectorCandidate, error) {
 		}
 	}
 	if !found {
-		return data1SelectorCandidate{}, fmt.Errorf("no .data1 selector table candidate found")
+		return data1SelectorCandidate{}, errors.New("no .data1 selector table candidate found")
 	}
 	return best, nil
 }

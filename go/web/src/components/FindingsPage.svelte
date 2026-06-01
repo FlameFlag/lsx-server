@@ -1,7 +1,6 @@
 <script lang="ts">
 import SvelteMarkdown from "@humanspeak/svelte-markdown";
 import { Buffer } from "buffer";
-import matter from "gray-matter";
 import hljs from "highlight.js/lib/core";
 import bash from "highlight.js/lib/languages/bash";
 import c from "highlight.js/lib/languages/c";
@@ -51,22 +50,36 @@ globals.Buffer ??= Buffer;
 $: article = parseFindings(data.markdown || "");
 
 function parseFindings(source: string): FindingArticle | null {
-  const parsed = matter(source);
-  const metadata = metadataFrom(parsed.data);
-  if (!metadata.title) return null;
-  return { ...metadata, ...contentSections(parsed.content) };
+  const parsed = parseFrontmatter(source);
+  if (!parsed.metadata.title) return null;
+  return { ...parsed.metadata, ...contentSections(parsed.content) };
 }
 
-function metadataFrom(value: Record<string, unknown>): Required<FindingsMatter> {
+function parseFrontmatter(source: string) {
+  if (!source.startsWith("---\n")) return { metadata: emptyMetadata(), content: source };
+
+  const end = source.indexOf("\n---", 4);
+  if (end < 0) return { metadata: emptyMetadata(), content: source };
+
   return {
-    kicker: stringValue(value.kicker),
-    title: stringValue(value.title),
-    updated: stringValue(value.updated)
+    metadata: metadataFromYAML(source.slice(4, end)),
+    content: source.slice(end + 4).replace(/^\r?\n/, "")
   };
 }
 
-function stringValue(value: unknown) {
-  return typeof value === "string" ? value : "";
+function emptyMetadata(): Required<FindingsMatter> {
+  return { kicker: "", title: "", updated: "" };
+}
+
+function metadataFromYAML(frontmatter: string): Required<FindingsMatter> {
+  const metadata = emptyMetadata();
+  for (const line of frontmatter.split(/\r?\n/)) {
+    const match = /^(kicker|title|updated):\s*(.*)$/.exec(line);
+    if (!match) continue;
+    const [, key, value] = match;
+    metadata[key as keyof Required<FindingsMatter>] = value.replace(/^['"]|['"]$/g, "").trim();
+  }
+  return metadata;
 }
 
 function contentSections(content: string) {
@@ -106,7 +119,7 @@ function headingTag(depth: number) {
   return `h${Math.min(Math.max(depth, 2), 4)}`;
 }
 
-function highlightedCode(text: string, lang: string) {
+function _highlightedCode(text: string, lang: string) {
   const language = lang && hljs.getLanguage(lang) ? lang : "";
   return language ? hljs.highlight(text, { language }).value : hljs.highlightAuto(text).value;
 }
@@ -132,16 +145,16 @@ function highlightedCode(text: string, lang: string) {
 
       <section class="findings-markdown">
         <SvelteMarkdown source={article.body} options={markdownOptions}>
-          {#snippet heading({ depth, text, children })}
-            <svelte:element this={headingTag(depth)} id={depth === 2 ? sectionId(text) : undefined}>
-              {@render children?.()}
+          {#snippet heading({ depth: _depth, text: _text, children: _children })}
+            <svelte:element this={headingTag(_depth)} id={_depth === 2 ? sectionId(_text) : undefined}>
+              {@render _children?.()}
             </svelte:element>
           {/snippet}
 
-          {#snippet code({ lang, text })}
+          {#snippet code({ lang: _lang, text: _text })}
             <pre
               class="findings-code"
-            ><code class={lang ? `language-${lang}` : ""}>{@html highlightedCode(text, lang)}</code></pre>
+            ><code class={_lang ? `language-${_lang}` : ""}>{@html _highlightedCode(_text, _lang)}</code></pre>
           {/snippet}
         </SvelteMarkdown>
       </section>

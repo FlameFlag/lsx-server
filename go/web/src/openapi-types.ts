@@ -4,190 +4,190 @@
  */
 
 export interface paths {
-  "/api/v1/leaderboard": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
+    "/api/v1/leaderboard": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List leaderboard rows
+         * @description Returns the live LSX leaderboard using the same ranking rules as the recovered HTML board.
+         */
+        get: operations["listLeaderboardRows"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        /** Check leaderboard resource availability */
+        head: operations["headLeaderboardRows"];
+        patch?: never;
+        trace?: never;
     };
-    /**
-     * List leaderboard rows
-     * @description Returns the live LSX leaderboard using the same ranking rules as the recovered HTML board.
-     */
-    get: operations["listLeaderboardRows"];
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    /** Check leaderboard resource availability */
-    head: operations["headLeaderboardRows"];
-    patch?: never;
-    trace?: never;
-  };
 }
 export type webhooks = Record<string, never>;
 export interface components {
-  schemas: {
-    LeaderboardResponse: {
-      data: components["schemas"]["LeaderboardRow"][];
-      pagination: components["schemas"]["Pagination"];
-      filters: components["schemas"]["Filters"];
-      /** @enum {string} */
-      sort: "market" | "company" | "ceo" | "lifespan";
+    schemas: {
+        LeaderboardResponse: {
+            data: components["schemas"]["LeaderboardRow"][];
+            pagination: components["schemas"]["Pagination"];
+            filters: components["schemas"]["Filters"];
+            /** @enum {string} */
+            sort: "market" | "company" | "ceo" | "lifespan";
+        };
+        LeaderboardRow: {
+            rank: number;
+            company: string;
+            ceo: string;
+            mode: string;
+            goal: string;
+            title: string;
+            /** Format: int64 */
+            lifespan: number;
+            /** Format: int64 */
+            market_cents: number;
+            /** Format: int64 */
+            revenue_cents: number;
+            /** Format: int64 */
+            retained_cents: number;
+            /** Format: int64 */
+            stands: number;
+            /** Format: int64 */
+            cups_sold: number;
+            username?: string;
+            date_scalar?: string;
+            source: string;
+            checksum_valid: boolean;
+        };
+        Pagination: {
+            page: number;
+            page_size: number;
+            total_items: number;
+            total_pages: number;
+        };
+        Filters: {
+            gamemode?: string;
+            gamegoal?: string;
+            username?: string;
+        };
+        Problem: {
+            /**
+             * Format: uri-reference
+             * @example about:blank
+             */
+            type: string;
+            title: string;
+            status: number;
+            detail?: string;
+        };
     };
-    LeaderboardRow: {
-      rank: number;
-      company: string;
-      ceo: string;
-      mode: string;
-      goal: string;
-      title: string;
-      /** Format: int64 */
-      lifespan: number;
-      /** Format: int64 */
-      market_cents: number;
-      /** Format: int64 */
-      revenue_cents: number;
-      /** Format: int64 */
-      retained_cents: number;
-      /** Format: int64 */
-      stands: number;
-      /** Format: int64 */
-      cups_sold: number;
-      username?: string;
-      date_scalar?: string;
-      source: string;
-      checksum_valid: boolean;
+    responses: {
+        /** @description Invalid query parameter. */
+        BadRequest: {
+            headers: {
+                [name: string]: unknown;
+            };
+            content: {
+                "application/problem+json": components["schemas"]["Problem"];
+            };
+        };
+        /** @description Unsupported HTTP method. */
+        MethodNotAllowed: {
+            headers: {
+                /** @example GET, HEAD */
+                Allow?: string;
+                [name: string]: unknown;
+            };
+            content: {
+                "application/problem+json": components["schemas"]["Problem"];
+            };
+        };
+        /** @description Server failed to load leaderboard data. */
+        InternalServerError: {
+            headers: {
+                [name: string]: unknown;
+            };
+            content: {
+                "application/problem+json": components["schemas"]["Problem"];
+            };
+        };
     };
-    Pagination: {
-      page: number;
-      page_size: number;
-      total_items: number;
-      total_pages: number;
+    parameters: {
+        /** @description Positive page number. Values past the last page return the last page. */
+        Page: number;
+        /** @description Positive page size capped at 100. */
+        PageSize: number;
+        /** @description Sort order for the leaderboard. */
+        Sort: "market" | "company" | "ceo" | "lifespan";
+        /** @description Case-insensitive exact username filter. */
+        Username: string;
+        /** @description Game mode filter matching recovered client values. */
+        GameMode: string;
+        /** @description Game goal filter matching recovered client values. */
+        GameGoal: string;
     };
-    Filters: {
-      gamemode?: string;
-      gamegoal?: string;
-      username?: string;
-    };
-    Problem: {
-      /**
-       * Format: uri-reference
-       * @example about:blank
-       */
-      type: string;
-      title: string;
-      status: number;
-      detail?: string;
-    };
-  };
-  responses: {
-    /** @description Invalid query parameter. */
-    BadRequest: {
-      headers: {
-        [name: string]: unknown;
-      };
-      content: {
-        "application/problem+json": components["schemas"]["Problem"];
-      };
-    };
-    /** @description Unsupported HTTP method. */
-    MethodNotAllowed: {
-      headers: {
-        /** @example GET, HEAD */
-        Allow?: string;
-        [name: string]: unknown;
-      };
-      content: {
-        "application/problem+json": components["schemas"]["Problem"];
-      };
-    };
-    /** @description Server failed to load leaderboard data. */
-    InternalServerError: {
-      headers: {
-        [name: string]: unknown;
-      };
-      content: {
-        "application/problem+json": components["schemas"]["Problem"];
-      };
-    };
-  };
-  parameters: {
-    /** @description Positive page number. Values past the last page return the last page. */
-    Page: number;
-    /** @description Positive page size capped at 100. */
-    PageSize: number;
-    /** @description Sort order for the leaderboard. */
-    Sort: "market" | "company" | "ceo" | "lifespan";
-    /** @description Case-insensitive exact username filter. */
-    Username: string;
-    /** @description Game mode filter matching recovered client values. */
-    GameMode: string;
-    /** @description Game goal filter matching recovered client values. */
-    GameGoal: string;
-  };
-  requestBodies: never;
-  headers: never;
-  pathItems: never;
+    requestBodies: never;
+    headers: never;
+    pathItems: never;
 }
 export type $defs = Record<string, never>;
 export interface operations {
-  listLeaderboardRows: {
-    parameters: {
-      query?: {
-        /** @description Positive page number. Values past the last page return the last page. */
-        page?: components["parameters"]["Page"];
-        /** @description Positive page size capped at 100. */
-        page_size?: components["parameters"]["PageSize"];
-        /** @description Sort order for the leaderboard. */
-        sort?: components["parameters"]["Sort"];
-        /** @description Case-insensitive exact username filter. */
-        username?: components["parameters"]["Username"];
-        /** @description Game mode filter matching recovered client values. */
-        gamemode?: components["parameters"]["GameMode"];
-        /** @description Game goal filter matching recovered client values. */
-        gamegoal?: components["parameters"]["GameGoal"];
-      };
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description Leaderboard rows. */
-      200: {
-        headers: {
-          [name: string]: unknown;
+    listLeaderboardRows: {
+        parameters: {
+            query?: {
+                /** @description Positive page number. Values past the last page return the last page. */
+                page?: components["parameters"]["Page"];
+                /** @description Positive page size capped at 100. */
+                page_size?: components["parameters"]["PageSize"];
+                /** @description Sort order for the leaderboard. */
+                sort?: components["parameters"]["Sort"];
+                /** @description Case-insensitive exact username filter. */
+                username?: components["parameters"]["Username"];
+                /** @description Game mode filter matching recovered client values. */
+                gamemode?: components["parameters"]["GameMode"];
+                /** @description Game goal filter matching recovered client values. */
+                gamegoal?: components["parameters"]["GameGoal"];
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
         };
-        content: {
-          "application/json": components["schemas"]["LeaderboardResponse"];
+        requestBody?: never;
+        responses: {
+            /** @description Leaderboard rows. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["LeaderboardResponse"];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            405: components["responses"]["MethodNotAllowed"];
+            500: components["responses"]["InternalServerError"];
         };
-      };
-      400: components["responses"]["BadRequest"];
-      405: components["responses"]["MethodNotAllowed"];
-      500: components["responses"]["InternalServerError"];
     };
-  };
-  headLeaderboardRows: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description Leaderboard resource is available. */
-      200: {
-        headers: {
-          [name: string]: unknown;
+    headLeaderboardRows: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
         };
-        content?: never;
-      };
-      400: components["responses"]["BadRequest"];
-      405: components["responses"]["MethodNotAllowed"];
-      500: components["responses"]["InternalServerError"];
+        requestBody?: never;
+        responses: {
+            /** @description Leaderboard resource is available. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            400: components["responses"]["BadRequest"];
+            405: components["responses"]["MethodNotAllowed"];
+            500: components["responses"]["InternalServerError"];
+        };
     };
-  };
 }

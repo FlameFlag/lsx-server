@@ -6,6 +6,7 @@ import (
 	"crypto/md5"
 	"encoding/binary"
 	"encoding/hex"
+	"errors"
 	"fmt"
 	"io"
 	"os"
@@ -134,7 +135,7 @@ func readMapperMetadataAndData1(packedPath string) ([]byte, []byte, error) {
 	compressedStart := mapperExpectedZlibOffset
 	compressedEnd := compressedStart + compressedSize
 	if compressedEnd > len(window) {
-		return nil, nil, fmt.Errorf("mapper metadata compressed range exceeds window")
+		return nil, nil, errors.New("mapper metadata compressed range exceeds window")
 	}
 	reader, err := zlib.NewReader(bytes.NewReader(window[compressedStart:compressedEnd]))
 	if err != nil {

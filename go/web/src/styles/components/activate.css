@@ -98,6 +98,26 @@
     overflow-wrap: anywhere;
   }
 
+  .math-flow {
+    @apply mt-4 grid gap-3;
+  }
+
+  .math-card {
+    @apply min-w-0 rounded-md border-2 border-lsx-border bg-white p-3;
+  }
+
+  .math-card h4 {
+    @apply mb-2 font-display text-xl leading-none text-lt2-heading;
+  }
+
+  .math-card p {
+    @apply max-w-none leading-6;
+  }
+
+  .math-card .copy-block {
+    @apply text-xs;
+  }
+
   .activate-footer {
     @apply border-t-2 border-[#cedb82] pt-4 text-center text-xs font-bold text-lsx-muted;
   }

@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"debug/pe"
 	"encoding/binary"
+	"errors"
 	"fmt"
 	"os"
 )
@@ -77,7 +78,7 @@ func rebuildCleanPE(packedPath, payloadPath, outputPath string, entryRVA uint32)
 	}
 	optional, ok := file.OptionalHeader.(*pe.OptionalHeader32)
 	if !ok {
-		return cleanPEInfo{}, fmt.Errorf("packed EXE is not PE32")
+		return cleanPEInfo{}, errors.New("packed EXE is not PE32")
 	}
 	if optional.SizeOfHeaders == 0 || int(optional.SizeOfHeaders) > len(packed) {
 		return cleanPEInfo{}, fmt.Errorf("invalid SizeOfHeaders 0x%X", optional.SizeOfHeaders)
@@ -111,7 +112,7 @@ func rebuildCleanPE(packedPath, payloadPath, outputPath string, entryRVA uint32)
 		return cleanPEInfo{}, err
 	}
 	if sectionTable+len(sections)*40 > int(optional.SizeOfHeaders) {
-		return cleanPEInfo{}, fmt.Errorf("clean section table exceeds header size")
+		return cleanPEInfo{}, errors.New("clean section table exceeds header size")
 	}
 
 	out := make([]byte, optional.SizeOfHeaders)
@@ -157,7 +158,7 @@ func findPESection(file *pe.File, name string) *pe.Section {
 
 func applyCleanRuntimePatches(payload []byte) error {
 	if len(payload) < payloadTextSize {
-		return fmt.Errorf("payload text is truncated")
+		return errors.New("payload text is truncated")
 	}
 	// The recovered game has an unsynchronized lazy UI-resource initializer that
 	// publishes its initialized flag before filling the global objects. On modern
@@ -234,7 +235,7 @@ func relocateResourceDataEntries(data []byte, oldRVA, newRVA, virtualSize uint32
 		if entriesOffset > uint32(len(data)) || uint32(len(data))-entriesOffset < uint32(entryCount*8) {
 			return fmt.Errorf("resource directory entries at 0x%X exceed section", entriesOffset)
 		}
-		for index := 0; index < entryCount; index++ {
+		for index := range entryCount {
 			entryOffset := entriesOffset + uint32(index*8)
 			value := binary.LittleEndian.Uint32(data[entryOffset+4 : entryOffset+8])
 			childOffset := value & 0x7FFFFFFF
@@ -259,11 +260,11 @@ func relocateResourceDataEntries(data []byte, oldRVA, newRVA, virtualSize uint32
 
 func peLayoutOffsets(data []byte) (int, int, int, error) {
 	if len(data) < 0x40 || !bytes.Equal(data[:2], []byte("MZ")) {
-		return 0, 0, 0, fmt.Errorf("not a PE/MZ file")
+		return 0, 0, 0, errors.New("not a PE/MZ file")
 	}
 	peOffset := int(binary.LittleEndian.Uint32(data[0x3C:0x40]))
 	if peOffset < 0 || peOffset+24 > len(data) || !bytes.Equal(data[peOffset:peOffset+4], []byte("PE\x00\x00")) {
-		return 0, 0, 0, fmt.Errorf("invalid PE header")
+		return 0, 0, 0, errors.New("invalid PE header")
 	}
 	optionalSize := int(binary.LittleEndian.Uint16(data[peOffset+20 : peOffset+22]))
 	optionalOffset := peOffset + 24
@@ -283,7 +284,7 @@ func patchCleanOptionalHeader(out []byte, optionalOffset int, entryRVA uint32, s
 	binary.LittleEndian.PutUint32(out[optionalOffset+56:optionalOffset+60], alignUp32(last.RVA+last.VirtualSize, sectionAlignment))
 	binary.LittleEndian.PutUint32(out[optionalOffset+64:optionalOffset+68], 0)
 	dataDir := optionalOffset + 96
-	for index := 0; index < 16; index++ {
+	for index := range 16 {
 		binary.LittleEndian.PutUint32(out[dataDir+index*8:dataDir+index*8+4], 0)
 		binary.LittleEndian.PutUint32(out[dataDir+index*8+4:dataDir+index*8+8], 0)
 	}

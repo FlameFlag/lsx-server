@@ -2,6 +2,7 @@ package normalizer
 
 import (
 	"encoding/binary"
+	"errors"
 	"fmt"
 )
 
@@ -256,14 +257,14 @@ func readGeneratedDecryptRanges(image []byte) ([]generatedDecryptRange, error) {
 
 func readGeneratedRelocationRVAs(image []byte) ([]int, error) {
 	if len(image) < 0x40 || string(image[:2]) != "MZ" {
-		return nil, fmt.Errorf("generated image missing MZ header")
+		return nil, errors.New("generated image missing MZ header")
 	}
 	peOffset := int(binary.LittleEndian.Uint32(image[0x3C:]))
 	optionalOffset := peOffset + 0x18
 	dataDirectoryOffset := optionalOffset + 0x60
 	relocationDirectory := dataDirectoryOffset + 5*8
 	if peOffset < 0 || relocationDirectory+8 > len(image) || string(image[peOffset:peOffset+4]) != "PE\x00\x00" {
-		return nil, fmt.Errorf("generated image missing PE relocation directory")
+		return nil, errors.New("generated image missing PE relocation directory")
 	}
 	relocRVA := int(binary.LittleEndian.Uint32(image[relocationDirectory:]))
 	relocSize := int(binary.LittleEndian.Uint32(image[relocationDirectory+4:]))
@@ -312,7 +313,7 @@ func deriveGeneratedTEASeed(image []byte, ranges []generatedDecryptRange, reloca
 		bootstrapStart := source.Offset - start
 		bootstrapEnd := bootstrapStart + source.Length
 		if bootstrapEnd > len(buffer) {
-			return 0, fmt.Errorf("bootstrap source range exceeds seed buffer")
+			return 0, errors.New("bootstrap source range exceeds seed buffer")
 		}
 		generatedTEAMode1(buffer[bootstrapStart:bootstrapEnd], generatedBootstrapSeed)
 	}

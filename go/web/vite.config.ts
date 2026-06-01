@@ -75,6 +75,7 @@ export default defineConfig({
     outDir: "dist",
     emptyOutDir: true,
     manifest: "manifest.json",
+    chunkSizeWarningLimit: 1200,
     rollupOptions: {
       input: resolve(configDir, "src/main.ts"),
       output: {

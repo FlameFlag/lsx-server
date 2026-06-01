@@ -134,7 +134,7 @@ func primePowerLog(g, h, p, order, q *big.Int, e int) (*big.Int, error) {
 	x := big.NewInt(0)
 	qPow := big.NewInt(1)
 	gamma := new(big.Int).Exp(g, new(big.Int).Div(order, q), p)
-	for j := 0; j < e; j++ {
+	for j := range e {
 		denom := new(big.Int).Mul(qPow, q)
 		exp := new(big.Int).Div(order, denom)
 		gx := new(big.Int).Exp(g, x, p)
@@ -163,7 +163,7 @@ func discreteLogBSGS(g, h, p, order *big.Int) (*big.Int, error) {
 	m := int64(math.Ceil(math.Sqrt(float64(order.Int64()))))
 	baby := make(map[string]int64, m)
 	e := big.NewInt(1)
-	for j := int64(0); j < m; j++ {
+	for j := range m {
 		baby[e.String()] = j
 		e.Mul(e, g).Mod(e, p)
 	}

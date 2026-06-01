@@ -1,6 +1,9 @@
 package normalizer
 
-import "fmt"
+import (
+	"errors"
+	"fmt"
+)
 
 type generatedChunk struct {
 	Data       []byte
@@ -43,7 +46,7 @@ func readGeneratedChunk(stream []byte, offset int, lengthKey uint32, outputLimit
 
 func generatedRLEDecompress(source []byte, outputLimit int) ([]byte, error) {
 	if len(source) == 0 {
-		return nil, fmt.Errorf("empty generated RLE source")
+		return nil, errors.New("empty generated RLE source")
 	}
 	if source[0] == 0 {
 		plainSize := len(source) - 1
@@ -67,7 +70,7 @@ func generatedRLEDecompress(source []byte, outputLimit int) ([]byte, error) {
 			continue
 		}
 		if cursor >= len(source) {
-			return nil, fmt.Errorf("truncated generated RLE escape")
+			return nil, errors.New("truncated generated RLE escape")
 		}
 		escape := source[cursor]
 		cursor++

@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"debug/pe"
 	"encoding/binary"
+	"errors"
 	"fmt"
 )
 
@@ -54,7 +55,7 @@ func deriveGeneratedImage(packedPath, outputPath string, loadBase uint32, replay
 func extractGeneratedDLLFromPDATA(sectionData []byte) ([]byte, error) {
 	firstStreamOffset := len(pdataSignature) + pdataFirstMetadataSize
 	if len(sectionData) < firstStreamOffset+2 || !bytes.HasPrefix(sectionData, pdataSignature) {
-		return nil, fmt.Errorf(".pdata signature mismatch")
+		return nil, errors.New(".pdata signature mismatch")
 	}
 	for searchOffset := firstStreamOffset; searchOffset < len(sectionData)-1; {
 		streamOffset := searchOffset
@@ -74,7 +75,7 @@ func extractGeneratedDLLFromPDATA(sectionData []byte) ([]byte, error) {
 		}
 		searchOffset = streamOffset + compressedSize
 	}
-	return nil, fmt.Errorf("generated PE asset not found in .pdata")
+	return nil, errors.New("generated PE asset not found in .pdata")
 }
 
 func isGeneratedPE(data []byte) bool {
@@ -101,15 +102,15 @@ func mapPEImage(data []byte, loadBase uint32) ([]byte, uint32, int, error) {
 	}
 	optional, ok := file.OptionalHeader.(*pe.OptionalHeader32)
 	if !ok {
-		return nil, 0, 0, fmt.Errorf("generated PE is not PE32")
+		return nil, 0, 0, errors.New("generated PE is not PE32")
 	}
 	if optional.SizeOfImage == 0 {
-		return nil, 0, 0, fmt.Errorf("generated PE has zero SizeOfImage")
+		return nil, 0, 0, errors.New("generated PE has zero SizeOfImage")
 	}
 	image := make([]byte, optional.SizeOfImage)
 	headerSize := int(optional.SizeOfHeaders)
 	if headerSize > len(data) {
-		return nil, 0, 0, fmt.Errorf("generated PE headers exceed file size")
+		return nil, 0, 0, errors.New("generated PE headers exceed file size")
 	}
 	copy(image, data[:headerSize])
 	for _, section := range file.Sections {
@@ -153,7 +154,7 @@ func applyBaseRelocations(image []byte, preferredBase uint32, loadBase uint32, r
 			return 0, fmt.Errorf("invalid relocation block size 0x%X", blockSize)
 		}
 		entryCount := (blockSize - 8) / 2
-		for i := 0; i < entryCount; i++ {
+		for range entryCount {
 			entry := binary.LittleEndian.Uint16(image[pos : pos+2])
 			pos += 2
 			typ := entry >> 12

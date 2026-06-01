@@ -101,21 +101,21 @@ const sectionTitle = (active: AdminData["Active"]) => {
   </section>
 </main>
 
-{#snippet ActionHidden(action: string, back: string)}
+{#snippet ActionHidden(_action: string, _back: string)}
   <input type="hidden" name="csrf" value={data.CSRF}>
-  <input type="hidden" name="action" value={action}>
-  <input type="hidden" name="back" value={back}>
+  <input type="hidden" name="action" value={_action}>
+  <input type="hidden" name="back" value={_back}>
 {/snippet}
 
-{#snippet DeleteButton(action: string, back: string, id: number)}
+{#snippet DeleteButton(_action: string, _back: string, _id: number)}
   <form class="inline" method="post" action={`${data.AdminPath}/action`}>
-    {@render ActionHidden(action, back)}
-    <input type="hidden" name="id" value={id}>
+    {@render ActionHidden(_action, _back)}
+    <input type="hidden" name="id" value={_id}>
     <button class="danger-button" type="submit">Delete</button>
   </form>
 {/snippet}
 
-{#snippet SubmissionsSection(data: AdminData, submissions: AdminSubmission[], money: (cents: number) => string)}
+{#snippet SubmissionsSection(_data: AdminData, _submissions: AdminSubmission[], _money: (cents: number) => string)}
   <form method="post" action={`${data.AdminPath}/action`}>
     {@render ActionHidden("seed", `${data.AdminPath}/submissions`)}
     <button class="game-button" type="submit">
@@ -136,13 +136,13 @@ const sectionTitle = (active: AdminData["Active"]) => {
         </tr>
       </thead>
       <tbody>
-        {#each submissions as sub}
+        {#each _submissions as sub}
           <tr>
             <td class="whitespace-nowrap">
               #{sub.ID}<br><span class="muted">{sub.When}</span><br><span class="muted">{sub.Remote}</span>
             </td>
             <td><b>{sub.Row.Company}</b><br>{sub.Row.CEO}<br><span class="muted">{sub.Host}</span></td>
-            <td class="font-black">${money(sub.Row.MarketCents)}</td>
+            <td class="font-black">${_money(sub.Row.MarketCents)}</td>
             <td>
               {#if sub.Valid}
                 <b class="valid-state">valid</b>
@@ -161,7 +161,7 @@ const sectionTitle = (active: AdminData["Active"]) => {
                   {@render ActionHidden("update_submission", `${data.AdminPath}/submissions`)}
                   <input type="hidden" name="id" value={sub.ID}>
                   <fieldset class="field-grid">
-                    {#each data.Fields as field}
+                    {#each _data.Fields as field}
                       <label>
                         <span>{field}</span>
                         <input class="admin-input" name={field} value={sub.Fields[field] || ""}>
@@ -183,7 +183,7 @@ const sectionTitle = (active: AdminData["Active"]) => {
   </section>
 {/snippet}
 
-{#snippet AccountsSection(data: AdminData, accounts: AccountRequest[], dateTime: (value: string) => string)}
+{#snippet AccountsSection(_data: AdminData, _accounts: AccountRequest[], _dateTime: (value: string) => string)}
   <section class="table-shell">
     <table class="admin-table">
       <thead>
@@ -198,10 +198,10 @@ const sectionTitle = (active: AdminData["Active"]) => {
         </tr>
       </thead>
       <tbody>
-        {#each accounts as account}
+        {#each _accounts as account}
           <tr>
             <td>#{account.ID}</td>
-            <td>{dateTime(account.ReceivedAt)}</td>
+            <td>{_dateTime(account.ReceivedAt)}</td>
             <td>{account.RemoteAddr}</td>
             <td><b>{account.Username}</b></td>
             <td>{account.Password}</td>
@@ -218,7 +218,7 @@ const sectionTitle = (active: AdminData["Active"]) => {
   </section>
 {/snippet}
 
-{#snippet EventsSection(data: AdminData, events: AdminEvent[], dateTime: (value: string) => string)}
+{#snippet EventsSection(_data: AdminData, _events: AdminEvent[], _dateTime: (value: string) => string)}
   <form method="post" action={`${data.AdminPath}/action`}>
     {@render ActionHidden("clear_events", `${data.AdminPath}/events`)}
     <button class="danger-button" type="submit">Clear all request logs</button>
@@ -239,10 +239,10 @@ const sectionTitle = (active: AdminData["Active"]) => {
         </tr>
       </thead>
       <tbody>
-        {#each events as event}
+        {#each _events as event}
           <tr>
             <td>#{event.ID}</td>
-            <td>{dateTime(event.Time)}</td>
+            <td>{_dateTime(event.Time)}</td>
             <td>{event.Kind}</td>
             <td>{event.Status}</td>
             <td>{event.RemoteAddr}</td>

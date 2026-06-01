@@ -204,10 +204,7 @@ func deriveLoaderWindowSize(data1 []byte, selectedVA, sectionVA uint32) (int, in
 		littleEndianUint32(data1[base+0x24:]) ^
 		littleEndianUint32(data1[base+0x18:])
 	rawSize := int(uint32(windowExpr - selectedVA + sectionVA))
-	effectiveSize := rawSize
-	if effectiveSize > mapperWindowSize {
-		effectiveSize = mapperWindowSize
-	}
+	effectiveSize := min(rawSize, mapperWindowSize)
 	return rawSize, effectiveSize, nil
 }
 

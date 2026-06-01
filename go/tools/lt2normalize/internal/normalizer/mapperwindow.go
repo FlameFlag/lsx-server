@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"compress/zlib"
 	"encoding/binary"
+	"errors"
 	"fmt"
 	"io"
 	"os"
@@ -71,7 +72,7 @@ func recoverMapperWindowSeed(encryptedWindow []byte, expectedMagic uint32) (uint
 	prngBytes := []byte{byte(keyDword >> 24), byte(keyDword >> 16), byte(keyDword >> 8), byte(keyDword)}
 	candidates := recoverGeneratedPRNGSeedCandidates(prngBytes)
 	if len(candidates) == 0 {
-		return 0, fmt.Errorf("failed to recover mapper PRNG seed from first dword")
+		return 0, errors.New("failed to recover mapper PRNG seed from first dword")
 	}
 	for _, seed := range candidates {
 		window := append([]byte(nil), encryptedWindow...)
@@ -87,7 +88,7 @@ func recoverMapperWindowSeed(encryptedWindow []byte, expectedMagic uint32) (uint
 		}
 		return seed, nil
 	}
-	return 0, fmt.Errorf("no mapper PRNG seed candidate produced valid metadata")
+	return 0, errors.New("no mapper PRNG seed candidate produced valid metadata")
 }
 
 func recoverGeneratedPRNGSeed(outputs []byte) (uint32, bool) {
@@ -169,7 +170,7 @@ func parseMapperMetadata(window []byte) (mapperMetadata, error) {
 	}
 	cursor := 0x14
 	if cursor+4 > len(metadata) {
-		return mapperMetadata{}, fmt.Errorf("mapper metadata missing checksum field")
+		return mapperMetadata{}, errors.New("mapper metadata missing checksum field")
 	}
 	result.Checksum = littleEndianUint32(metadata[cursor:])
 	cursor += 4
@@ -189,7 +190,7 @@ func parseMapperMetadata(window []byte) (mapperMetadata, error) {
 		cursor += length
 	}
 	if cursor >= len(metadata) {
-		return mapperMetadata{}, fmt.Errorf("mapper dependency list is unterminated")
+		return mapperMetadata{}, errors.New("mapper dependency list is unterminated")
 	}
 	cursor++
 	dependencyBlobSize, next, err := readLengthPrefixedBlobSize(metadata, cursor)
@@ -200,7 +201,7 @@ func parseMapperMetadata(window []byte) (mapperMetadata, error) {
 	if cursor+dependencyBlobSize > len(metadata) {
 		return mapperMetadata{}, fmt.Errorf("mapper dependency blob 0x%X..0x%X exceeds metadata size 0x%X", cursor, cursor+dependencyBlobSize, len(metadata))
 	}
-	for _, item := range bytes.Split(metadata[cursor:cursor+dependencyBlobSize], []byte{0}) {
+	for item := range bytes.SplitSeq(metadata[cursor:cursor+dependencyBlobSize], []byte{0}) {
 		if len(item) != 0 {
 			result.Dependencies = append(result.Dependencies, string(item))
 		}
@@ -270,7 +271,7 @@ func mapperMagicFromData1(data1 []byte) (uint32, error) {
 func findPDATATailOffset(sectionData []byte) (int, error) {
 	firstStreamOffset := len(pdataSignature) + pdataFirstMetadataSize
 	if len(sectionData) < firstStreamOffset+2 || !bytes.HasPrefix(sectionData, pdataSignature) {
-		return 0, fmt.Errorf(".pdata signature mismatch or section too small")
+		return 0, errors.New(".pdata signature mismatch or section too small")
 	}
 	lastEnd := firstStreamOffset
 	for searchOffset := firstStreamOffset; searchOffset < len(sectionData)-1; {

@@ -15,7 +15,6 @@
     "@sveltejs/vite-plugin-svelte": "^7.1.2",
     "@tailwindcss/vite": "^4.3.0",
     "buffer": "^6.0.3",
-    "gray-matter": "^4.0.3",
     "highlight.js": "^11.11.1",
     "openapi-fetch": "^0.17.0",
     "redoc": "^2.5.2",
