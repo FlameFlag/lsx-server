@@ -6,6 +6,7 @@
 
 #include "lt2rb/util.h"
 
+int lt2rb_validate_rb(Lt2rbBuffer rb);
 int lt2rb_extract_bitmap_pngs(Lt2rbBuffer rb, const char *output_dir,
     bool transparency, size_t *out_count);
 

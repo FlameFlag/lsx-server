@@ -48,16 +48,18 @@ The source of truth is `decompiled/findings/findings.ini`.
 
 ## `lt2rb`
 
-Extracts `Lemonade2.rb`, exports image records, and validates RB round-tripping.
+Reads, writes, validates, and exports assets from Lemonade Tycoon 2 `Lemonade2.rb` bundles.
 
 ```sh
 go -C go run ./tools/lt2rb -- "/path/to/Lemonade Tycoon 2 - New York City.exe"
 go -C go run ./tools/lt2rb -extract-images ./lt2-images -- "Lemonade Tycoon 2 - New York City.exe"
 go -C go run ./tools/lt2rb -rb-input -extract-images ./lt2-images Lemonade2.rb
 go -C go run ./tools/lt2rb -roundtrip-md5 -- "Lemonade Tycoon 2 - New York City.exe"
+# C implementation only, for byte-structure validation:
+(cd go/tools/lt2rb/c && ./lt2rb -rb-input -validate-rb ../../../../decompiled/local/lt2_install/Lemonade2.rb)
 ```
 
-A C23 implementation remains under `go/tools/lt2rb/c/` and builds with
+The C23 implementation lives under `go/tools/lt2rb/c/` and builds with
 `./build.sh` from that directory.
 
 ## `shortv3derive`

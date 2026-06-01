@@ -23,6 +23,7 @@ typedef struct Config {
     bool rb_input;
     bool no_transparency;
     bool roundtrip_md5;
+    bool validate_rb;
     bool scan;
     bool quiet;
 } Config;
@@ -51,6 +52,8 @@ static void usage(FILE *stream, const char *argv0)
     fprintf(stream, "  -output PATH        output .rb or compressed stream path\n");
     fprintf(stream,
         "  -roundtrip-md5      decompress, recompress, and require compressed MD5 match\n");
+    fprintf(stream,
+        "  -validate-rb        validate Lemonade2.rb container structure after reading/decompressing\n");
     fprintf(stream, "  -scan               list bzip2 stream candidates and exit\n");
     fprintf(stream, "  -quiet              suppress success output\n");
 }
@@ -201,6 +204,11 @@ static int parse_args(int argc, char **argv, Config *cfg)
             if (matched < 0) return 0;
             if (matched > 0) continue;
 
+            matched = option_bool(arg, "-validate-rb", &cfg->validate_rb);
+            if (matched == 0) matched = option_bool(arg, "--validate-rb", &cfg->validate_rb);
+            if (matched < 0) return 0;
+            if (matched > 0) continue;
+
             matched = option_bool(arg, "-scan", &cfg->scan);
             if (matched == 0) matched = option_bool(arg, "--scan", &cfg->scan);
             if (matched < 0) return 0;
@@ -271,12 +279,21 @@ static int run(int argc, char **argv)
     }
     if (cfg.rb_input) {
         if (cfg.roundtrip_md5) return lt2rb_set_error("-roundtrip-md5 expects an installer input, not -rb-input");
-        if (cfg.extract_images == NULL || cfg.extract_images[0] == '\0') return lt2rb_set_error("-rb-input requires -extract-images");
+        if (!cfg.validate_rb && (cfg.extract_images == NULL || cfg.extract_images[0] == '\0')) return lt2rb_set_error("-rb-input requires -extract-images or -validate-rb");
         if (!lt2rb_read_file_all(cfg.input, &rb)) return 0;
-        int ok = lt2rb_extract_bitmap_pngs(rb, cfg.extract_images, !cfg.no_transparency, &count);
+        if (cfg.validate_rb && !lt2rb_validate_rb(rb)) {
+            lt2rb_free_buffer(&rb);
+            return 0;
+        }
+        if (!cfg.quiet && cfg.validate_rb) printf("validated %s\n", cfg.input);
+        if (cfg.extract_images != NULL && cfg.extract_images[0] != '\0') {
+            int ok = lt2rb_extract_bitmap_pngs(rb, cfg.extract_images, !cfg.no_transparency, &count);
+            lt2rb_free_buffer(&rb);
+            if (!ok) return 0;
+            if (!cfg.quiet) printf("wrote %zu bitmap PNG(s) to %s\n", count, cfg.extract_images);
+            return 1;
+        }
         lt2rb_free_buffer(&rb);
-        if (!ok) return 0;
-        if (!cfg.quiet) printf("wrote %zu bitmap PNG(s) to %s\n", count, cfg.extract_images);
         return 1;
     }
 
@@ -285,6 +302,13 @@ static int run(int argc, char **argv)
         return 0;
     }
     if (!cfg.quiet) printf("wrote %s (%llu bytes)\n", cfg.output, (unsigned long long)written);
+    if (cfg.validate_rb) {
+        if (!lt2rb_read_file_all(cfg.output, &rb)) return 0;
+        int ok = lt2rb_validate_rb(rb);
+        lt2rb_free_buffer(&rb);
+        if (!ok) return 0;
+        if (!cfg.quiet) printf("validated %s\n", cfg.output);
+    }
     if (cfg.roundtrip_md5) {
         char *compressed_path = lt2rb_append_suffix(cfg.output, ".bz2");
         if (compressed_path == NULL) return 0;
