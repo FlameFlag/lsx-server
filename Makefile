@@ -25,7 +25,7 @@ SUBMAKE_DIRS := \
 
 SH_SCRIPTS := \
 	build.sh \
-	go/tools/rbdecompress/c/build.sh \
+	go/tools/lt2rb/c/build.sh \
 	go/tools/shortv3derive/recover.sh \
 	go/tools/compile-ghidra-scripts.sh \
 	decompiled/ghidra_scripts/build_unpacked_project.sh \
@@ -139,7 +139,7 @@ check-submakes:
 	$(MAKE) -C decompiled/analysis/lemonade2_static_unpacking check
 
 check-c-tools:
-	cd go/tools/rbdecompress/c && ./build.sh
+	cd go/tools/lt2rb/c && ./build.sh
 
 check-decompiled-c:
 	@if command -v clang >/dev/null 2>&1; then \

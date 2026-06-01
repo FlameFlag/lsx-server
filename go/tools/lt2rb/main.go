@@ -76,7 +76,7 @@ func (f byteCountFlag) String() string {
 
 func main() {
 	if err := run(os.Args[1:], os.Stdout, os.Stderr); err != nil {
-		_, _ = fmt.Fprintf(os.Stderr, "rbdecompress: %v\n", err)
+		_, _ = fmt.Fprintf(os.Stderr, "lt2rb: %v\n", err)
 		os.Exit(1)
 	}
 }
@@ -88,7 +88,7 @@ func run(args []string, stdout io.Writer, stderr io.Writer) error {
 		length: defaultRBLength,
 	}
 
-	fs := flag.NewFlagSet("rbdecompress", flag.ContinueOnError)
+	fs := flag.NewFlagSet("lt2rb", flag.ContinueOnError)
 	fs.SetOutput(stderr)
 	fs.Var(byteCountFlag{value: &cfg.offset}, "offset", "compressed stream byte offset; accepts decimal or 0x-prefixed hex")
 	fs.Var(byteCountFlag{value: &cfg.length}, "length", "compressed byte count; use 0 to read to end of input")

@@ -135,7 +135,7 @@
       "type": "shell",
       "command": "./build.sh",
       "options": {
-        "cwd": "${workspaceFolder}/go/tools/rbdecompress/c"
+        "cwd": "${workspaceFolder}/go/tools/lt2rb/c"
       },
       "group": "build",
       "problemMatcher": [

@@ -239,7 +239,7 @@ build_tools() {
 }
 
 tool_commands=(
-	'rbdecompress=./tools/rbdecompress=purego'
+	'lt2rb=./tools/lt2rb=purego'
 	'lt2findings=./tools/lt2findings=cgo'
 	'lt2install=./tools/lt2install=purego'
 	'lt2keygen=./tools/lt2keygen=purego'

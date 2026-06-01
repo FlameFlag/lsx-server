@@ -41,9 +41,9 @@
       ghidraScripts = pkgs.callPackage ../packages/ghidra-scripts.nix {
         inherit self version;
       };
-      rbdecompress = buildGoTool {
-        pname = "rbdecompress";
-        subPackage = "./tools/rbdecompress";
+      lt2rb = buildGoTool {
+        pname = "lt2rb";
+        subPackage = "./tools/lt2rb";
       };
       lt2findings = buildGoTool {
         pname = "lt2findings";
@@ -83,7 +83,7 @@
           lt2install
           lt2keygen
           lt2normalize
-          rbdecompress
+          lt2rb
           shortv3derive
           ;
         keyvis-search = keyvisSearch;

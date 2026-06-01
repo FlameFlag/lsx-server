@@ -418,7 +418,7 @@ $hostArch = Get-GoEnv 'GOHOSTARCH'
 $hostPair = Normalize-Target $hostOS $hostArch
 
 $toolCommands = @(
-    @{ Name = 'rbdecompress'; Package = './tools/rbdecompress'; RequiresCgo = $false },
+    @{ Name = 'lt2rb'; Package = './tools/lt2rb'; RequiresCgo = $false },
     @{ Name = 'lt2findings'; Package = './tools/lt2findings'; RequiresCgo = $true },
     @{ Name = 'lt2install'; Package = './tools/lt2install'; RequiresCgo = $false },
     @{ Name = 'lt2keygen'; Package = './tools/lt2keygen'; RequiresCgo = $false },

@@ -15,7 +15,7 @@
           lt2install
           lt2keygen
           lt2normalize
-          rbdecompress
+          lt2rb
           shortv3derive
           ;
 
