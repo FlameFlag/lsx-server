@@ -7,6 +7,7 @@
 
 #include <errno.h>
 #include <stdbool.h>
+#include <stddef.h>
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -28,34 +29,56 @@ typedef struct Config {
     bool quiet;
 } Config;
 
+typedef enum OptionKind {
+    OPTION_BOOL,
+    OPTION_STRING,
+    OPTION_OUTPUT,
+    OPTION_U64,
+} OptionKind;
+
+typedef struct CliOption {
+    const char *name;
+    const char *metavar;
+    const char *help;
+    OptionKind kind;
+    size_t field_offset;
+} CliOption;
+
+static const CliOption cli_options[] = {
+    {"offset", "N", "compressed stream byte offset; decimal or 0x-prefixed hex", OPTION_U64, offsetof(Config, offset)},
+    {"length", "N", "compressed byte count; use 0 to read to end of input", OPTION_U64, offsetof(Config, length)},
+    {"compress-rb", NULL, "treat input as a decompressed .rb file and write a bzip2 stream", OPTION_BOOL, offsetof(Config, compress_rb)},
+    {"extract-images", "D", "directory where bitmap records should be written as PNGs", OPTION_STRING, offsetof(Config, extract_images)},
+    {"rb-input", NULL, "treat input as an already decompressed Lemonade2.rb file", OPTION_BOOL, offsetof(Config, rb_input)},
+    {"no-transparency", NULL, "preserve chroma-key pixels instead of making them transparent", OPTION_BOOL, offsetof(Config, no_transparency)},
+    {"output", "PATH", "output .rb or compressed stream path", OPTION_OUTPUT, offsetof(Config, output)},
+    {"roundtrip-md5", NULL, "decompress, recompress, and require compressed MD5 match", OPTION_BOOL, offsetof(Config, roundtrip_md5)},
+    {"validate-rb", NULL, "validate Lemonade2.rb container structure after reading/decompressing", OPTION_BOOL, offsetof(Config, validate_rb)},
+    {"scan", NULL, "list bzip2 stream candidates and exit", OPTION_BOOL, offsetof(Config, scan)},
+    {"quiet", NULL, "suppress success output", OPTION_BOOL, offsetof(Config, quiet)},
+};
+
 static void usage(FILE *stream, const char *argv0)
 {
     fprintf(stream, "Usage: %s [flags] installer.exe [output.rb]\n\n", argv0);
     fprintf(stream,
-        "Decompresses and creates Lemonade Tycoon 2 resource-bundle payloads.\n");
+        "Reads, writes, and validates Lemonade Tycoon 2 resource-bundle payloads.\n");
     fprintf(stream, "Defaults target Lemonade2.rb at offset 0x%X with length %llu.\n\n",
         LT2RB_DEFAULT_RB_OFFSET, (unsigned long long)LT2RB_DEFAULT_RB_LENGTH);
     fprintf(stream, "You can get the installer from:\n  %s\n\n", LT2RB_SOURCE_URL);
     fprintf(stream, "Flags:\n");
-    fprintf(stream,
-        "  -offset N           compressed stream byte offset; decimal or 0x-prefixed hex\n");
-    fprintf(stream,
-        "  -length N           compressed byte count; use 0 to read to end of input\n");
-    fprintf(stream,
-        "  -compress-rb        treat input as a decompressed .rb file and write a bzip2 stream\n");
-    fprintf(stream,
-        "  -extract-images D   directory where bitmap records should be written as PNGs\n");
-    fprintf(stream,
-        "  -rb-input           treat input as an already decompressed Lemonade2.rb file\n");
-    fprintf(stream,
-        "  -no-transparency    preserve chroma-key pixels instead of making them transparent\n");
-    fprintf(stream, "  -output PATH        output .rb or compressed stream path\n");
-    fprintf(stream,
-        "  -roundtrip-md5      decompress, recompress, and require compressed MD5 match\n");
-    fprintf(stream,
-        "  -validate-rb        validate Lemonade2.rb container structure after reading/decompressing\n");
-    fprintf(stream, "  -scan               list bzip2 stream candidates and exit\n");
-    fprintf(stream, "  -quiet              suppress success output\n");
+    fprintf(stream, "  %-20s %s\n", "-h, --help", "show this help and exit");
+    for (size_t i = 0; i < sizeof(cli_options) / sizeof(cli_options[0]); i++) {
+        const CliOption *opt = &cli_options[i];
+        char display[64];
+
+        if (opt->metavar != NULL) {
+            snprintf(display, sizeof(display), "-%s %s", opt->name, opt->metavar);
+        } else {
+            snprintf(display, sizeof(display), "-%s", opt->name);
+        }
+        fprintf(stream, "  %-20s %s\n", display, opt->help);
+    }
 }
 
 static int parse_u64(const char *text, uint64_t *out)
@@ -90,39 +113,58 @@ static int parse_bool(const char *text, bool *out)
     return lt2rb_set_error("invalid boolean value: %s", text);
 }
 
-static int option_value(int *index, int argc, char **argv, const char *arg,
-    const char *name, const char **value)
+static void *config_field(Config *cfg, size_t offset)
 {
-    size_t name_len = strlen(name);
-
-    if (strcmp(arg, name) == 0) {
-        if (*index + 1 >= argc) {
-            lt2rb_set_error("%s requires a value", name);
-            return -1;
-        }
-        *index += 1;
-        *value = argv[*index];
-        return 1;
-    }
-    if (strncmp(arg, name, name_len) == 0 && arg[name_len] == '=') {
-        *value = arg + name_len + 1;
-        return 1;
-    }
-    return 0;
+    return (void *)((unsigned char *)cfg + offset);
 }
 
-static int option_bool(const char *arg, const char *name, bool *value)
+static const CliOption *find_option(const char *arg, const char **inline_value)
 {
-    size_t name_len = strlen(name);
+    const char *name;
+    const char *equals;
+    size_t name_len;
 
-    if (strcmp(arg, name) == 0) {
-        *value = true;
+    *inline_value = NULL;
+    if (arg[0] != '-') return NULL;
+
+    name = arg + 1;
+    if (name[0] == '-') name++;
+    if (name[0] == '\0') return NULL;
+
+    equals = strchr(name, '=');
+    name_len = equals == NULL ? strlen(name) : (size_t)(equals - name);
+    if (equals != NULL) *inline_value = equals + 1;
+
+    for (size_t i = 0; i < sizeof(cli_options) / sizeof(cli_options[0]); i++) {
+        const CliOption *opt = &cli_options[i];
+        if (strlen(opt->name) == name_len && strncmp(opt->name, name, name_len) == 0) {
+            return opt;
+        }
+    }
+    return NULL;
+}
+
+static int apply_option(Config *cfg, const CliOption *opt, const char *arg,
+    const char *value)
+{
+    switch (opt->kind) {
+    case OPTION_BOOL:
+        if (value == NULL) {
+            *(bool *)config_field(cfg, opt->field_offset) = true;
+            return 1;
+        }
+        return parse_bool(value, (bool *)config_field(cfg, opt->field_offset));
+    case OPTION_STRING:
+        *(const char **)config_field(cfg, opt->field_offset) = value;
         return 1;
+    case OPTION_OUTPUT:
+        *(const char **)config_field(cfg, opt->field_offset) = value;
+        cfg->output_set = true;
+        return 1;
+    case OPTION_U64:
+        return parse_u64(value, (uint64_t *)config_field(cfg, opt->field_offset));
     }
-    if (strncmp(arg, name, name_len) == 0 && arg[name_len] == '=') {
-        return parse_bool(arg + name_len + 1, value) ? 1 : -1;
-    }
-    return 0;
+    return lt2rb_set_error("internal option table error for %s", arg);
 }
 
 static int parse_args(int argc, char **argv, Config *cfg)
@@ -140,7 +182,6 @@ static int parse_args(int argc, char **argv, Config *cfg)
     for (int i = 1; i < argc; i++) {
         const char *arg = argv[i];
         const char *value = NULL;
-        int matched;
 
         if (!end_options && strcmp(arg, "--") == 0) {
             end_options = true;
@@ -151,75 +192,19 @@ static int parse_args(int argc, char **argv, Config *cfg)
             exit(0);
         }
         if (!end_options && arg[0] == '-') {
-            matched = option_value(&i, argc, argv, arg, "-offset", &value);
-            if (matched == 0) matched = option_value(&i, argc, argv, arg, "--offset", &value);
-            if (matched < 0) return 0;
-            if (matched > 0) {
-                if (!parse_u64(value, &cfg->offset)) return 0;
-                continue;
+            const CliOption *opt = find_option(arg, &value);
+
+            if (opt == NULL) {
+                return lt2rb_set_error("unknown option: %s", arg);
             }
-
-            matched = option_value(&i, argc, argv, arg, "-length", &value);
-            if (matched == 0) matched = option_value(&i, argc, argv, arg, "--length", &value);
-            if (matched < 0) return 0;
-            if (matched > 0) {
-                if (!parse_u64(value, &cfg->length)) return 0;
-                continue;
+            if (opt->kind != OPTION_BOOL && value == NULL) {
+                if (i + 1 >= argc) {
+                    return lt2rb_set_error("%s requires a value", arg);
+                }
+                value = argv[++i];
             }
-
-            matched = option_value(&i, argc, argv, arg, "-extract-images", &value);
-            if (matched == 0) matched = option_value(&i, argc, argv, arg, "--extract-images", &value);
-            if (matched < 0) return 0;
-            if (matched > 0) {
-                cfg->extract_images = value;
-                continue;
-            }
-
-            matched = option_value(&i, argc, argv, arg, "-output", &value);
-            if (matched == 0) matched = option_value(&i, argc, argv, arg, "--output", &value);
-            if (matched < 0) return 0;
-            if (matched > 0) {
-                cfg->output = value;
-                cfg->output_set = true;
-                continue;
-            }
-
-            matched = option_bool(arg, "-compress-rb", &cfg->compress_rb);
-            if (matched == 0) matched = option_bool(arg, "--compress-rb", &cfg->compress_rb);
-            if (matched < 0) return 0;
-            if (matched > 0) continue;
-
-            matched = option_bool(arg, "-rb-input", &cfg->rb_input);
-            if (matched == 0) matched = option_bool(arg, "--rb-input", &cfg->rb_input);
-            if (matched < 0) return 0;
-            if (matched > 0) continue;
-
-            matched = option_bool(arg, "-roundtrip-md5", &cfg->roundtrip_md5);
-            if (matched == 0) matched = option_bool(arg, "--roundtrip-md5", &cfg->roundtrip_md5);
-            if (matched < 0) return 0;
-            if (matched > 0) continue;
-
-            matched = option_bool(arg, "-no-transparency", &cfg->no_transparency);
-            if (matched == 0) matched = option_bool(arg, "--no-transparency", &cfg->no_transparency);
-            if (matched < 0) return 0;
-            if (matched > 0) continue;
-
-            matched = option_bool(arg, "-validate-rb", &cfg->validate_rb);
-            if (matched == 0) matched = option_bool(arg, "--validate-rb", &cfg->validate_rb);
-            if (matched < 0) return 0;
-            if (matched > 0) continue;
-
-            matched = option_bool(arg, "-scan", &cfg->scan);
-            if (matched == 0) matched = option_bool(arg, "--scan", &cfg->scan);
-            if (matched < 0) return 0;
-            if (matched > 0) continue;
-
-            matched = option_bool(arg, "-quiet", &cfg->quiet);
-            if (matched == 0) matched = option_bool(arg, "--quiet", &cfg->quiet);
-            if (matched < 0) return 0;
-            if (matched > 0) continue;
-
-            return lt2rb_set_error("unknown option: %s", arg);
+            if (!apply_option(cfg, opt, arg, value)) return 0;
+            continue;
         }
 
         if (positional_count == 3) {
