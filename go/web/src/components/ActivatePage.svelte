@@ -1,5 +1,6 @@
 <script lang="ts">
 import { onMount } from "svelte";
+import { generateActivationPair } from "../keygen";
 import type { ProjectData } from "../types";
 import ProjectShell from "./ProjectShell.svelte";
 
@@ -11,32 +12,26 @@ let regName = "";
 let requestedName = "";
 let activationKey = "";
 let keyFormat = "";
-let keyLoading = false;
 let keyError = "";
 
 onMount(() => {
-  void fetchKey();
+  generateKey();
 });
 
-async function fetchKey() {
-  keyLoading = true;
+function generateKey() {
   keyError = "";
   try {
-    const query = requestedName.trim() ? `?name=${encodeURIComponent(requestedName.trim())}` : "";
-    const resp = await fetch(`/api/v1/keygen${query}`);
-    if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
-    const json = await resp.json();
-    regName = json.registration_name;
-    if (!requestedName.trim()) requestedName = json.registration_name;
-    activationKey = json.activation_key;
-    keyFormat = json.key_format;
+    const requested = requestedName.trim();
+    const pair = generateActivationPair(requested);
+    regName = pair.registrationName;
+    if (!requested) requestedName = pair.registrationName;
+    activationKey = pair.activationKey;
+    keyFormat = pair.format;
   } catch (e) {
     keyError = e instanceof Error ? e.message : "Failed to generate key";
     regName = "";
     activationKey = "";
     keyFormat = "";
-  } finally {
-    keyLoading = false;
   }
 }
 </script>
@@ -53,7 +48,6 @@ async function fetchKey() {
           validation; the hosts setup below catches those if this install/configuration tries to use them.
         </p>
       </section>
-      <a class="sort-link" href="/api/v1/keygen" target="_blank" rel="noopener">Keygen JSON</a>
     </header>
 
     <dl class="summary-grid" aria-label="Activation requirements">
@@ -88,8 +82,8 @@ async function fetchKey() {
             placeholder="Leave blank for a random name"
             autocomplete="off"
           >
-          <button class="game-button" type="button" onclick={fetchKey} disabled={keyLoading}>
-            {keyLoading ? "Generating..." : requestedName.trim() ? "Generate for Name" : "Generate Random Pair"}
+          <button class="game-button" type="button" onclick={generateKey}>
+            {requestedName.trim() ? "Generate for Name" : "Generate Random Pair"}
           </button>
         </div>
 
