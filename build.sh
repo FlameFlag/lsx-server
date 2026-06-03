@@ -1,5 +1,5 @@
 #!/usr/bin/env nix-shell
-#! nix-shell -i bash -p bash go_1_26 git coreutils findutils nodejs_24 golangci-lint jdk21_headless gradle
+#! nix-shell nix/build-shell.nix -i bash
 # shellcheck shell=bash
 # shfmt: format with `shfmt -ln bash`; bash is the runtime shebang.
 set -Eeuo pipefail

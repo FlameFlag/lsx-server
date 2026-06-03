@@ -457,7 +457,7 @@ type staticPayloadPatch struct {
 }
 
 func parseStaticPayloadPatches(encoded string) ([]staticPayloadPatch, error) {
-	var patches []staticPayloadPatch
+	patches := make([]staticPayloadPatch, 0, strings.Count(encoded, "\n")+1)
 	for line := range strings.FieldsSeq(encoded) {
 		parts := strings.SplitN(line, ":", 2)
 		if len(parts) != 2 {

@@ -127,7 +127,7 @@ func writeUninstallerBlock(dst *bytes.Buffer, id uint32, payload []byte) {
 
 func buildUninstallerFilePayload() []byte {
 	var payload bytes.Buffer
-	var entries []installEntry
+	entries := make([]installEntry, 0, len(installEntries))
 	for _, entry := range installEntries {
 		if strings.EqualFold(entry.name, "Uninstal.exe") {
 			continue

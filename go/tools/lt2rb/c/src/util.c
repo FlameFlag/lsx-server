@@ -3,7 +3,6 @@
 #include "lt2rb/error.h"
 
 #include <errno.h>
-#include <limits.h>
 #include <stdbool.h>
 #include <stdlib.h>
 #include <string.h>
@@ -34,18 +33,6 @@ int lt2rb_file_size(FILE *file, uint64_t *out)
         return lt2rb_set_error("rewind input: %s", strerror(errno));
     }
     *out = (uint64_t)size;
-    return 1;
-}
-
-int lt2rb_seek_u64(FILE *file, uint64_t offset)
-{
-    if (offset > (uint64_t)LONG_MAX) {
-        return lt2rb_set_error("offset 0x%llX is too large for this C runtime",
-            (unsigned long long)offset);
-    }
-    if (fseek(file, (long)offset, SEEK_SET) != 0) {
-        return lt2rb_set_error("seek input: %s", strerror(errno));
-    }
     return 1;
 }
 

@@ -41,9 +41,9 @@ func loadResolvedCRTSymbols(path string, findings []finding, cSymbols []cSymbol)
 		conflicts[s.Name] = "C symbol " + s.Source
 	}
 
-	var symbols []cSymbol
-	seen := map[string]bool{}
 	lines := strings.Split(strings.ReplaceAll(string(data), "\r\n", "\n"), "\n")
+	symbols := make([]cSymbol, 0, len(lines))
+	seen := map[string]bool{}
 	for i, raw := range lines {
 		lineNo := i + 1
 		line := strings.TrimSpace(raw)

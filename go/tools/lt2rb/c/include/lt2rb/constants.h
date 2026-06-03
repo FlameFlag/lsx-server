@@ -4,7 +4,6 @@
 #include <stdint.h>
 
 enum {
-    LT2RB_DEFAULT_RB_OFFSET = 0xFEA4C,
     LT2RB_SEGMENT_TABLE_OFFSET = 0x1038,
     LT2RB_SEGMENT_HEADER_SIZE = 12,
 
@@ -40,10 +39,5 @@ enum {
 };
 
 static const uint32_t LT2RB_PREAMBLE_SIGNATURE = 0x848EDDC3u;
-
-static const uint64_t LT2RB_DEFAULT_RB_LENGTH = 8072295;
-static const char *const LT2RB_DEFAULT_OUTPUT = "Lemonade2.rb";
-static const char *const LT2RB_SOURCE_URL =
-    "https://www.myabandonware.com/game/lemonade-tycoon-2-c4g";
 
 #endif

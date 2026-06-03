@@ -1,5 +1,5 @@
 #!/usr/bin/env nix-shell
-#! nix-shell -i bash -p bash clang pkg-config bzip2 libpng zlib coreutils gnused
+#! nix-shell -i bash -p bash clang pkg-config libpng zlib coreutils gnused
 set -Eeuo pipefail
 
 out=${1:-lt2rb}
@@ -7,8 +7,8 @@ std=${STD:-c23}
 cc_bin=${CC:-cc}
 cflags=(-Iinclude)
 ldflags=()
-libs=(-lbz2 -lpng -lz)
-sources=(src/lt2rb.c src/bzip2_stream.c src/rb.c src/md5.c src/util.c src/error.c)
+libs=(-lpng -lz)
+sources=(src/lt2rb.c src/archive.c src/rb.c src/util.c src/error.c)
 
 if [[ -n ${CFLAGS_EXTRA:-} ]]; then
   # shellcheck disable=SC2206 # intentional simple word splitting for compiler flags
@@ -22,7 +22,7 @@ if [[ -n ${LDFLAGS_EXTRA:-} ]]; then
 fi
 
 if command -v pkg-config >/dev/null && pkg-config --exists libpng; then
-  # bzip2 commonly ships without a pkg-config file; libpng carries zlib flags.
+  # libpng carries zlib flags.
   while IFS= read -r flag; do cflags+=("$flag"); done < <(pkg-config --cflags-only-I libpng | tr ' ' '\n' | sed '/^$/d')
   while IFS= read -r flag; do ldflags+=("$flag"); done < <(pkg-config --libs-only-L libpng | tr ' ' '\n' | sed '/^$/d')
 fi
