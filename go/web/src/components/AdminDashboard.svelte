@@ -25,6 +25,13 @@ const sectionTitle = (active: AdminData["Active"]) => {
   if (active === "events") return "Request Logs";
   return "Submissions";
 };
+
+const accountID = (account: AccountRequest) => account.ID ?? account.id ?? 0;
+const accountReceivedAt = (account: AccountRequest) => account.ReceivedAt ?? account.received_at ?? "";
+const accountRemote = (account: AccountRequest) => account.RemoteAddr ?? account.remote_addr ?? "";
+const accountUsername = (account: AccountRequest) => account.Username ?? account.username ?? "";
+const accountPassword = (account: AccountRequest) => account.Password ?? account.password ?? "";
+const accountRawQuery = (account: AccountRequest) => account.RawQuery ?? account.raw_query ?? "";
 </script>
 
 <main class="admin-screen">
@@ -125,7 +132,7 @@ const sectionTitle = (active: AdminData["Active"]) => {
   </form>
 
   <section class="table-shell">
-    <table class="admin-table">
+    <table class="admin-table submissions-table">
       <thead>
         <tr>
           <th>ID</th>
@@ -185,7 +192,7 @@ const sectionTitle = (active: AdminData["Active"]) => {
 
 {#snippet AccountsSection(_data: AdminData, _accounts: AccountRequest[], _dateTime: (value: string) => string)}
   <section class="table-shell">
-    <table class="admin-table">
+    <table class="admin-table accounts-table">
       <thead>
         <tr>
           <th>ID</th>
@@ -200,13 +207,13 @@ const sectionTitle = (active: AdminData["Active"]) => {
       <tbody>
         {#each _accounts as account}
           <tr>
-            <td>#{account.ID}</td>
-            <td>{_dateTime(account.ReceivedAt)}</td>
-            <td>{account.RemoteAddr}</td>
-            <td><b>{account.Username}</b></td>
-            <td>{account.Password}</td>
-            <td class="raw-query">{account.RawQuery}</td>
-            <td>{@render DeleteButton("delete_account", `${data.AdminPath}/accounts`, account.ID)}</td>
+            <td>#{accountID(account)}</td>
+            <td>{_dateTime(accountReceivedAt(account))}</td>
+            <td>{accountRemote(account)}</td>
+            <td><b>{accountUsername(account)}</b></td>
+            <td>{accountPassword(account)}</td>
+            <td class="raw-query">{accountRawQuery(account)}</td>
+            <td>{@render DeleteButton("delete_account", `${data.AdminPath}/accounts`, accountID(account))}</td>
           </tr>
         {:else}
           <tr>
@@ -225,7 +232,7 @@ const sectionTitle = (active: AdminData["Active"]) => {
   </form>
 
   <section class="table-shell">
-    <table class="admin-table">
+    <table class="admin-table events-table">
       <thead>
         <tr>
           <th>ID</th>

@@ -41,12 +41,18 @@ export type AdminSubmission = {
 };
 
 export type AccountRequest = {
-  ID: number;
-  ReceivedAt: string;
-  RemoteAddr: string;
-  Username: string;
-  Password: string;
-  RawQuery: string;
+  ID?: number;
+  ReceivedAt?: string;
+  RemoteAddr?: string;
+  Username?: string;
+  Password?: string;
+  RawQuery?: string;
+  id?: number;
+  received_at?: string;
+  remote_addr?: string;
+  username?: string;
+  password?: string;
+  raw_query?: string;
 };
 
 export type DetailField = {
