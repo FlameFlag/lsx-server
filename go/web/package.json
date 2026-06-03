@@ -17,7 +17,6 @@
     "buffer": "^6.0.3",
     "highlight.js": "^11.11.1",
     "openapi-fetch": "^0.17.0",
-    "redoc": "^2.5.2",
     "slugify": "^1.6.9",
     "svelte": "^5.55.10",
     "tailwindcss": "^4.3.0",

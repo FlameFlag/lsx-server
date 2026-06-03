@@ -1,6 +1,5 @@
 <script lang="ts">
 import createClient from "openapi-fetch";
-import redocUrl from "redoc/bundles/redoc.standalone.js?url";
 import { onMount } from "svelte";
 import type { paths } from "../openapi-types";
 import type { ProjectData } from "../types";
@@ -9,43 +8,21 @@ import ProjectShell from "./ProjectShell.svelte";
 export let data: ProjectData;
 
 const api = createClient<paths>({ baseUrl: "" });
-const redocOptions = {
-  hideHostname: true,
-  nativeScrollbars: true,
-  scrollYOffset: 12
-};
+const sampleResponse = `{
+  "data": [
+    { "rank": 1, "company": "Example Stand", "ceo": "Player", "market_cents": 1234500 }
+  ],
+  "pagination": { "page": 1, "page_size": 10, "total_items": 81, "total_pages": 9 },
+  "filters": {},
+  "sort": "market"
+}`;
 
-let redocElement: HTMLElement;
-let docsError = "";
 let sampleRows: number | null = null;
 let sampleError = "";
-let redocScript: Promise<void> | null = null;
 
 onMount(() => {
-  void mountRedoc();
   void loadSample();
 });
-
-async function mountRedoc() {
-  try {
-    await loadRedocScript();
-    window.Redoc.init("/openapi.yaml", redocOptions, redocElement);
-  } catch (caught) {
-    docsError = caught instanceof Error ? caught.message : "unknown error";
-  }
-}
-
-function loadRedocScript() {
-  redocScript ??= new Promise((resolve, reject) => {
-    const script = document.createElement("script");
-    script.src = redocUrl;
-    script.onload = () => resolve();
-    script.onerror = () => reject(new Error("Unable to load Redoc"));
-    document.head.append(script);
-  });
-
-  return redocScript;
-}
 
 async function loadSample() {
   const { data: leaderboard, error } = await api.GET("/api/v1/leaderboard", {
@@ -70,7 +47,7 @@ function problemTitle(error: unknown) {
       <section>
         <p class="eyebrow">OpenAPI</p>
         <h2 class="docs-title">LSX Server API</h2>
-        <p class="docs-copy">Live contract documentation and a typed leaderboard sample.</p>
+        <p class="docs-copy">Live LSX leaderboard contract and health checks.</p>
       </section>
       <nav class="docs-actions" aria-label="API resources">
         <a class="sort-link" href="/openapi.yaml">OpenAPI YAML</a>
@@ -93,10 +70,54 @@ function problemTitle(error: unknown) {
       </section>
     </dl>
 
-    {#if docsError}
-      <p class="status-message error">OpenAPI documentation could not be loaded: {docsError}</p>
-    {/if}
+    <section class="api-reference" aria-label="OpenAPI reference">
+      <article class="endpoint-card">
+        <header class="endpoint-head">
+          <span class="endpoint-method get">GET</span>
+          <code>/api/v1/leaderboard</code>
+        </header>
+        <p>Returns ranked LSX company rows using the recovered leaderboard ordering.</p>
+        <dl class="endpoint-grid">
+          <section>
+            <dt>Query</dt>
+            <dd><code>page</code> integer, default <code>1</code></dd>
+            <dd><code>page_size</code> integer, default <code>10</code>, max <code>100</code></dd>
+            <dd><code>sort</code> one of <code>market</code>, <code>company</code>, <code>ceo</code>, <code>lifespan</code></dd>
+            <dd><code>username</code>, <code>gamemode</code>, <code>gamegoal</code> filters</dd>
+          </section>
+          <section>
+            <dt>Response</dt>
+            <dd><code>data[]</code> rows with <code>rank</code>, <code>company</code>, <code>ceo</code>, market value</dd>
+            <dd><code>pagination</code> object with total count and page bounds</dd>
+          </section>
+        </dl>
+      </article>
 
-    <section bind:this={redocElement} class="redoc-panel" aria-label="OpenAPI reference"></section>
+      <article class="endpoint-card">
+        <header class="endpoint-head">
+          <span class="endpoint-method head">HEAD</span>
+          <code>/api/v1/leaderboard</code>
+        </header>
+        <p>Checks whether the read-only leaderboard resource is available without downloading a body.</p>
+        <dl class="endpoint-grid">
+          <section>
+            <dt>Success</dt>
+            <dd><code>200</code> leaderboard resource is present</dd>
+          </section>
+          <section>
+            <dt>Errors</dt>
+            <dd><code>404</code> not found, <code>405</code> unsupported method, <code>500</code> server error</dd>
+          </section>
+        </dl>
+      </article>
+
+      <article class="sample-card">
+        <header class="endpoint-head">
+          <span class="endpoint-method sample">JSON</span>
+          <code>sample response</code>
+        </header>
+        <pre>{sampleResponse}</pre>
+      </article>
+    </section>
   </article>
 </ProjectShell>

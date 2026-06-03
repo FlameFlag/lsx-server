@@ -12,10 +12,6 @@
     @apply mt-2 max-w-2xl text-sm font-semibold text-lsx-muted;
   }
 
-  .redoc-panel {
-    @apply mt-5 min-h-160 overflow-hidden rounded-lg border-2 border-lsx-border bg-white;
-  }
-
   .status-message {
     @apply mt-5 rounded-md bg-[#eef6bd] p-4 font-bold;
   }
@@ -41,5 +37,73 @@
   .docs-stat dd,
   .admin-stat dd {
     @apply mt-1 text-2xl font-black;
+  }
+
+  .api-reference {
+    @apply mt-5 grid gap-4;
+  }
+
+  .endpoint-card,
+  .sample-card {
+    @apply rounded-lg border-2 border-lt2-border bg-lt2-soft/88 p-4 text-sm font-bold text-lsx-ink shadow-lt2-card;
+    background-image: repeating-linear-gradient(
+      0deg,
+      rgba(255, 255, 255, 0.28) 0 10px,
+      rgba(150, 217, 56, 0.1) 10px 20px
+    );
+  }
+
+  .endpoint-head {
+    @apply flex flex-wrap items-center gap-3;
+  }
+
+  .endpoint-head code {
+    @apply rounded-md bg-[#23351a] px-3 py-2 text-[#f6ffd8];
+  }
+
+  .endpoint-method {
+    @apply rounded-md border-2 border-[#6aa52a] px-3 py-1 font-display text-xl leading-none text-white shadow-lt2-button;
+    text-shadow: 0 2px 1px rgba(42, 96, 18, 0.62);
+  }
+
+  .endpoint-method.get {
+    @apply bg-[#34a60f];
+  }
+
+  .endpoint-method.head {
+    @apply bg-[#278b79];
+  }
+
+  .endpoint-method.sample {
+    @apply bg-[#e1b91b] text-lt2-ink;
+    text-shadow: 0 1px 0 rgba(255, 255, 255, 0.62);
+  }
+
+  .endpoint-card p {
+    @apply mt-3 max-w-3xl leading-6 text-lsx-muted;
+  }
+
+  .endpoint-grid {
+    @apply mt-4 grid gap-3 md:grid-cols-2;
+  }
+
+  .endpoint-grid section {
+    @apply rounded-md border-2 border-lt2-frame bg-lt2-surface/80 p-3;
+  }
+
+  .endpoint-grid dt {
+    @apply mb-2 text-xs font-black uppercase text-[#5f7b2e];
+  }
+
+  .endpoint-grid dd {
+    @apply m-0 leading-6;
+  }
+
+  .endpoint-grid code {
+    @apply rounded bg-[#fff7a8] px-1.5 py-0.5 text-lt2-ink;
+  }
+
+  .sample-card pre {
+    @apply mt-3 overflow-x-auto rounded-md bg-[#1f2c18] p-4 text-xs leading-6 text-[#f5ffd8];
   }
 }
