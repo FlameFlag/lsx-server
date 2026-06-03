@@ -1,26 +1,54 @@
 ---
 kicker: LSX implementation notes
 title: How Lemonade Tycoon 2 talks to LSX
-updated: 2026-05-28
+updated: 2026-06-03
 ---
 
-The LSX revival only needs to imitate the parts of the old service the game actually touches. The client is plain, direct, and much smaller than the surrounding installer and asset format make it look.
+The LSX server only needs to implement the endpoints the game actually touches. The client is plain, direct, and much smaller than the surrounding installer and asset format make it look.
 
-Four pieces matter: the installer payload, `Lemonade2.rb`, the embedded browser wrapper, and the Winsock HTTP code in the game runtime. The browser shows LSX pages. The game executable sends account checks and career uploads.
+Four pieces matter: the installer payload, `Lemonade2.rb`, the embedded browser wrapper, and the Winsock HTTP code in the unpacked game runtime. The browser shows LSX pages through a local `Lsx\CheckConnection.html` file. The game executable sends account checks and career uploads directly.
 
 | Item               | Finding                                          |
 | -------------------| ------------------------------------------------ |
 | Main resource file | `Lemonade2.rb`, a 27 MB binary container         |
 | Active host        | `gt.jamdat.ca`                                   |
-| Browser check      | `/img/lsx2/connection.gif`                       |
+| Browser entry      | `Lsx\CheckConnection.html`                       |
+| Connectivity asset | `/img/lsx2/connection.gif`                       |
 | Leaderboard page   | `/lsx2.php`                                      |
 | Account endpoint   | `/createaccount.php` returns `ACCEPT`            |
 | Upload endpoint    | `/syncgame.php?game=lemonade2` returns `SUCCESS` |
 | Upload method      | HTTP GET over port 80                            |
 
+## Runtime behavior {#runtime-behavior}
+
+The unpacked executable contains the LSX request builders, checksum helper, date helper, and local browser entry path.
+
+| Item                                          | Meaning                                                                 |
+| --------------------------------------------- | ----------------------------------------------------------------------- |
+| `lemonade2.unpacked.lsx_upload` at `004073C0` | runtime builds and sends the score upload request                       |
+| `lemonade2.unpacked.lsx_account` at `0045FB70`| runtime builds and sends the account request                            |
+| `lemonade2.unpacked.lsx_checksum` at `00410030` | checksum helper maps to `lt2_lsx_compute_checksum`                   |
+| `lemonade2.unpacked.packed_date` at `00418FF0` | date scalar helper maps to `lt2_lsx_packed_date_scalar`               |
+| `lemonade2.unpacked.lsx_connection_page` at `00420F10` | browser entry is a local `Lsx\CheckConnection.html` path        |
+| `teneon.load_url` at `10001210`               | browser DLL only performs URL navigation                                |
+
+One compatibility edge case matters: the client sets its post-request flag when the expected token is present, but also when the HTTP helper itself fails. A successful HTTP response without `SUCCESS` is the case that leaves the upload flag clear. Returning the expected token remains the correct server behavior.
+
+```c title="Request flag behavior"
+int lt2_lsx_client_sets_request_flag(int request_result, const char *body,
+    const char *token)
+{
+    if (body != NULL && token != NULL && strstr(body, token) != NULL) {
+        return 1;
+    }
+
+    return request_result != LT2_LSX_HTTP_RESULT_OK;
+}
+```
+
 ## The installer contains the useful payloads {#installer-payloads}
 
-The Clickteam installer contains compressed payloads for the main resource file and the embedded browser DLL. That means recovery starts by carving the setup executable, not by chasing an installer manifest.
+The Clickteam installer contains compressed payloads for the main resource file and the embedded browser DLL. Carve the setup executable directly.
 
 | Offset     | Payload      | Installed role                   |
 | ---------- | ------------ | -------------------------------- |
@@ -76,26 +104,27 @@ def parse_segments(buf, start=SEGMENT_TABLE_OFFSET):
     return segments
 ```
 
-## The endpoint evidence comes from the runtime {#runtime-endpoints}
+## Runtime endpoints {#runtime-endpoints}
 
-The string table includes old UI copy and a historical `hexacto.com` LSX URL. The running client path points at `gt.jamdat.ca` and builds requests for `/createaccount.php`, `/syncgame.php?game=lemonade2`, `/lsx2.php`, and `/img/lsx2/connection.gif`.
+The resource file includes UI copy and a `hexacto.com` LSX URL. The executable request path points at `gt.jamdat.ca` and builds requests for `/createaccount.php`, `/syncgame.php?game=lemonade2`, `/lsx2.php`, and `/img/lsx2/connection.gif`.
 
-That split is the important server rule. The resource container explains menus, messages, and old links. The runtime tells us the compatibility contract.
+That split is the important server rule. The resource container explains menus, messages, and bundled links. The unpacked runtime defines the compatibility contract.
 
 | String or path                                       | Seen in                     | Server meaning                |
 | ---------------------------------------------------- | --------------------------- | ----------------------------- |
 | `Your game has been successfully transfered to LSX!` | `Lemonade2.rb` string table | upload success message        |
 | `The database is not accessible.`                    | `Lemonade2.rb` string table | upload failure message        |
-| `gt.jamdat.ca`                                       | runtime references          | active service host           |
-| `/createaccount.php?`                                | runtime references          | account probe                 |
-| `/syncgame.php?game=lemonade2`                       | runtime references          | career upload                 |
-| `/img/lsx2/connection.gif`                           | browser check page          | visible LSX connectivity test |
+| `gt.jamdat.ca`                                       | unpacked runtime references | active service host           |
+| `/createaccount.php?`                                | unpacked runtime references | account probe                 |
+| `/syncgame.php?game=lemonade2`                       | unpacked runtime references | career upload                 |
+| `Lsx\CheckConnection.html`                           | unpacked runtime references | local browser entry page      |
+| `/img/lsx2/connection.gif`                           | local browser page          | visible LSX connectivity test |
 
 ## The browser is only the window {#browser-boundary}
 
 The DLL exposes browser-style calls such as `LoadURL`, `Back`, `Forward`, `Refresh`, `Show`, and `Hide`. Its navigation call passes no post data and no custom headers.
 
-The visible LSX panel starts at a local file, checks whether the remote GIF loads, then redirects to the leaderboard. That behavior needs server support, but it is separate from account and score transfer.
+The visible LSX panel starts at a local file path built by the game, checks whether the remote GIF loads, then redirects to the leaderboard. That behavior needs server support, but it is separate from account and score transfer.
 
 ```title="Browser-side flow"
 Lsx\CheckConnection.html
@@ -153,7 +182,7 @@ upload_ok  = http_request_ok && strstr(response, "SUCCESS") != NULL;
 
 The checksum is still worth computing because it lets the server flag bad or synthetic submissions. It should not block baseline compatibility unless strict mode is deliberately enabled.
 
-`gamestartingdate` is a fixed-calendar scalar, not a Unix timestamp. The game uses 360-day years and 30-day months.
+`gamestartingdate` is a fixed-calendar scalar, not a Unix timestamp. The game uses 360-day years and 30-day months, then lets the signed 32-bit client arithmetic wrap.
 
 | Query field        | Checksum role                           |
 | ------------------ | --------------------------------------- |
@@ -163,42 +192,41 @@ The checksum is still worth computing because it lets the server flag bad or syn
 | `stands`           | subtracts `stands * 100` from revenues  |
 | `cupssold`         | subtracted                              |
 | `cashassets`       | added                                   |
-| `stockassets`      | sent, not used in the recovered formula |
+| `stockassets`      | sent, not used in the checksum helper   |
 | `standsassets`     | subtracted                              |
 | `upgradesassets`   | added                                   |
 | `retainedearnings` | added                                   |
 | `gamemode`         | adds `gamemode * 7`                     |
 | `gamegoal`         | adds `gamegoal * 5`                     |
 
-```python title="Checksum formula"
-checksum = (
-    gamestartingdate
-    * (revenues - stands * 100)
-    * lifespan
-    + gamegoal * 5
-    - standsassets
-    - cupssold
-    + gamemode * 7
-    + retainedearnings
-    + upgradesassets
-    + cashassets
-)
+```c title="Checksum helper"
+value =
+    fields->gamestartingdate *
+    (fields->revenues - fields->stands * 100) *
+    fields->lifespan +
+    fields->gamegoal * 5 -
+    fields->standsassets -
+    fields->cupssold +
+    fields->gamemode * 7 +
+    fields->retainedearnings +
+    fields->upgradesassets +
+    fields->cashassets;
 ```
 
-```python title="Date scalar"
-gamestartingdate = (
-    (((year * 360 + month * 30 + day) * 24 + hour) * 60 + minute)
-    * 60 * 1000
-    + second * 1000
-    + millisecond
-)
+```c title="Date scalar"
+value =
+    date->year * (int32_t)0x3df16000 +
+    date->month * (int32_t)-0x65813800 +
+    (((date->day * 24 + date->hour) * 60 + date->minute) * 60 +
+     date->second) * 1000 +
+    date->millisecond;
 ```
 
 ## The leaderboard shape is recoverable {#leaderboard}
 
 The public LSX page is a compact table with rank, company, CEO, lifespan, and market cap. It accepts controls such as `pagenum`, `sort`, `gamemode`, `gamegoal`, `ranktype`, and `username`.
 
-Company rows open a detail page through `d1` through `d18` query parameters. One correction matters for rendering: `d6` is the total number of entries in the current leaderboard view.
+Company rows open a detail page through `d1` through `d18` query parameters. `d6` is the total number of entries in the selected leaderboard view.
 
 | Detail parameter | Meaning                       |
 | ---------------- | ----------------------------- |
@@ -230,7 +258,7 @@ The core server behavior is direct:
 - Return text containing `SUCCESS` for accepted upload attempts.
 - Serve `/img/lsx2/connection.gif` so the embedded browser connection check passes.
 - Render `/lsx2.php` and detail pages in the compact legacy shape.
-- Compute the recovered checksum for admin review and optional strict mode.
+- Compute the checksum for admin review and optional strict mode.
 
 ```go title="Minimum account handler"
 func handleCreateAccount(query url.Values) []byte {

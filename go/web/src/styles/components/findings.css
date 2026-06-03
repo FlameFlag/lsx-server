@@ -3,8 +3,9 @@
     @apply text-lsx-ink;
     box-sizing: border-box;
     width: 100%;
-    max-width: 860px;
+    max-width: 900px;
     margin-inline: auto;
+    overflow: hidden;
   }
 
   .findings-root h2 {
@@ -13,6 +14,10 @@
 
   .findings-root h3 {
     @apply mt-5 font-display text-2xl text-lsx-ink;
+  }
+
+  .findings-root h4 {
+    @apply font-display text-xl leading-tight text-lsx-ink;
   }
 
   .findings-root p {
@@ -49,7 +54,7 @@
   }
 
   .findings-root table {
-    @apply mt-4 w-full min-w-170 border-collapse bg-white text-sm;
+    @apply mt-4 w-full min-w-150 border-collapse bg-white text-sm;
   }
 
   .findings-root table {
