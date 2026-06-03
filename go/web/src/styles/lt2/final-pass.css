@@ -80,12 +80,26 @@
     );
   }
 
+  .admin-screen .screen-map,
+  .admin-screen .screen-wash {
+    @apply fixed;
+    min-height: 100vh;
+    height: 100vh;
+  }
+
+  .admin-screen .screen-map {
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-position: center center;
+    filter: saturate(1.08) contrast(1.05) brightness(0.94);
+  }
+
   .admin-shell {
     @apply max-w-295 gap-4 px-4 py-4;
   }
 
   .admin-brand-header {
-    @apply h-31.5 max-w-290 rounded-3xl border-2 border-lt2-glow bg-[#dfffaa]/86 shadow-[inset_0_2px_0_rgba(255,255,255,.75),0_6px_8px_rgba(39,91,23,.28)];
+    @apply grid h-auto w-full max-w-290 grid-cols-[minmax(220px,300px)_1fr] items-center gap-6 rounded-3xl border-2 border-lt2-glow bg-[#dfffaa]/86 px-6 py-4 shadow-[inset_0_2px_0_rgba(255,255,255,.75),0_6px_8px_rgba(39,91,23,.28)];
     background-image: repeating-linear-gradient(
       0deg,
       rgba(255, 255, 255, 0.26) 0 12px,
@@ -95,11 +109,11 @@
 
   .admin-brand-mark,
   .admin-screen .brand-mark {
-    @apply left-6 -top-0.5 w-75 translate-x-0;
+    @apply static block w-full max-w-75 translate-x-0;
   }
 
   .admin-nav {
-    @apply absolute bottom-5 left-85 right-6 z-30 flex items-center justify-end gap-5;
+    @apply static z-30 grid grid-cols-4 items-center gap-4;
   }
 
   .admin-nav .project-tab,
@@ -201,7 +215,12 @@
 
   @media (max-width: 900px) {
     .admin-brand-header {
-      @apply h-auto px-4 pb-5 pt-20;
+      @apply grid-cols-1 gap-4 px-4 py-5;
+    }
+
+    .admin-brand-mark,
+    .admin-screen .brand-mark {
+      @apply mx-auto max-w-65;
     }
 
     .admin-nav {
@@ -226,11 +245,11 @@
 
   /* LT2 reference pass: larger menu tabs and report-style admin data panels. */
   .admin-brand-header {
-    @apply h-34;
+    @apply h-auto;
   }
 
   .admin-nav {
-    @apply bottom-4 left-90 gap-6;
+    @apply gap-5;
   }
 
   .admin-nav .project-tab,
@@ -270,7 +289,7 @@
   .admin-table {
     border-collapse: separate;
     border-spacing: 0 8px;
-    table-layout: fixed;
+    table-layout: auto;
   }
 
   .admin-table th {
@@ -302,19 +321,84 @@
     @apply rounded-r-lg border-r-2;
   }
 
-  .admin-table th:nth-child(1),
-  .admin-table td:nth-child(1) {
+  .submissions-table {
+    min-width: 760px;
+  }
+
+  .accounts-table {
+    min-width: 0;
+    table-layout: fixed;
+  }
+
+  .events-table {
+    min-width: 980px;
+  }
+
+  .submissions-table th:nth-child(1),
+  .submissions-table td:nth-child(1) {
     width: 150px;
   }
 
-  .admin-table th:nth-child(3),
-  .admin-table td:nth-child(3) {
+  .submissions-table th:nth-child(3),
+  .submissions-table td:nth-child(3) {
     width: 135px;
   }
 
-  .admin-table th:nth-child(4),
-  .admin-table td:nth-child(4) {
+  .submissions-table th:nth-child(4),
+  .submissions-table td:nth-child(4) {
     width: 170px;
+  }
+
+  .accounts-table th:first-child,
+  .accounts-table td:first-child,
+  .events-table th:first-child,
+  .events-table td:first-child {
+    width: 88px;
+  }
+
+  .accounts-table th:nth-child(2),
+  .accounts-table td:nth-child(2),
+  .events-table th:nth-child(2),
+  .events-table td:nth-child(2) {
+    width: 180px;
+  }
+
+  .accounts-table th:nth-child(3),
+  .accounts-table td:nth-child(3) {
+    width: 120px;
+  }
+
+  .accounts-table th:nth-child(4),
+  .accounts-table td:nth-child(4),
+  .accounts-table th:nth-child(5),
+  .accounts-table td:nth-child(5) {
+    width: 110px;
+  }
+
+  .accounts-table .raw-query {
+    max-width: none;
+    overflow-wrap: anywhere;
+    word-break: break-word;
+  }
+
+  .events-table th:nth-child(3),
+  .events-table td:nth-child(3) {
+    width: 128px;
+  }
+
+  .events-table th:nth-child(4),
+  .events-table td:nth-child(4) {
+    width: 96px;
+  }
+
+  .events-table th:nth-child(5),
+  .events-table td:nth-child(5) {
+    width: 140px;
+  }
+
+  .events-table th:nth-child(6),
+  .events-table td:nth-child(6) {
+    width: 220px;
   }
 
   .admin-table th:last-child,
@@ -389,5 +473,40 @@
 
   .admin-table td:last-child .danger-button {
     @apply w-full px-2;
+  }
+
+  @media (max-width: 900px) {
+    .admin-brand-header {
+      @apply grid-cols-1 gap-4 px-4 py-5;
+    }
+
+    .admin-brand-mark,
+    .admin-screen .brand-mark {
+      @apply mx-auto max-w-65;
+    }
+
+    .admin-nav {
+      @apply grid grid-cols-2 gap-3;
+    }
+
+    .admin-nav .project-tab,
+    .admin-nav button.project-tab {
+      @apply gap-2 text-xl;
+    }
+
+    .admin-nav .project-tab img {
+      @apply h-11 w-11;
+    }
+  }
+
+  @media (max-width: 520px) {
+    .admin-nav {
+      @apply grid-cols-1;
+    }
+
+    .admin-nav .project-tab,
+    .admin-nav button.project-tab {
+      @apply justify-between rounded-lg border-2 border-lt2-border bg-lt2-soft/86 px-3 py-2 text-[22px] shadow-lt2-button;
+    }
   }
 }

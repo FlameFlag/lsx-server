@@ -36,14 +36,14 @@ go -C go run ./tools/lt2normalize \
 
 ## Known Hashes
 
-| Artifact | SHA-256 |
-| --- | --- |
-| Canonical payload | `0a14f853214920d91abbb596a369efbb2a3a6ff5bc9e93e8c41500aa5c0d1f7f` |
+| Artifact                 | SHA-256                                                            |
+| ------------------------ | ------------------------------------------------------------------ |
+| Canonical payload        | `0a14f853214920d91abbb596a369efbb2a3a6ff5bc9e93e8c41500aa5c0d1f7f` |
 | Canonical normalized EXE | `ce1ff9868c70e49ce7123684341a49b10627e731d769daa4b568421726ea4caa` |
-| Portable payload | `babd032c53ceb22909155ef5a7e602ae40bd85c76ea7119c022729004acddb64` |
-| Portable normalized EXE | `8db2008a47aa4fa1c865a82a2e225a88a8df67d626af924ebf18d45c7f9ca11f` |
-| Strict payload | `98426f442bd67fc6fadeabf6bf2bae562de5dea4effa52abb4ab7373b56fd7ba` |
-| Strict normalized EXE | `34247cbbec6fcf04933d4653454892bc66570f94f8128e577369367342ba028c` |
+| Portable payload         | `babd032c53ceb22909155ef5a7e602ae40bd85c76ea7119c022729004acddb64` |
+| Portable normalized EXE  | `8db2008a47aa4fa1c865a82a2e225a88a8df67d626af924ebf18d45c7f9ca11f` |
+| Strict payload           | `98426f442bd67fc6fadeabf6bf2bae562de5dea4effa52abb4ab7373b56fd7ba` |
+| Strict normalized EXE    | `34247cbbec6fcf04933d4653454892bc66570f94f8128e577369367342ba028c` |
 
 ## Static-Unpacking Workspace
 

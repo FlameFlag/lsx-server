@@ -23,14 +23,14 @@ Four pieces matter: the installer payload, `Lemonade2.rb`, the embedded browser 
 
 The unpacked executable contains the LSX request builders, checksum helper, date helper, and local browser entry path.
 
-| Item                                          | Meaning                                                                 |
-| --------------------------------------------- | ----------------------------------------------------------------------- |
-| `lemonade2.unpacked.lsx_upload` at `004073C0` | runtime builds and sends the score upload request                       |
-| `lemonade2.unpacked.lsx_account` at `0045FB70`| runtime builds and sends the account request                            |
-| `lemonade2.unpacked.lsx_checksum` at `00410030` | checksum helper maps to `lt2_lsx_compute_checksum`                   |
-| `lemonade2.unpacked.packed_date` at `00418FF0` | date scalar helper maps to `lt2_lsx_packed_date_scalar`               |
-| `lemonade2.unpacked.lsx_connection_page` at `00420F10` | browser entry is a local `Lsx\CheckConnection.html` path        |
-| `teneon.load_url` at `10001210`               | browser DLL only performs URL navigation                                |
+| Item                                                   | Meaning                                                                 |
+| ------------------------------------------------------ | ----------------------------------------------------------------------- |
+| `lemonade2.unpacked.lsx_upload` at `004073C0`          | runtime builds and sends the score upload request                       |
+| `lemonade2.unpacked.lsx_account` at `0045FB70`         | runtime builds and sends the account request                            |
+| `lemonade2.unpacked.lsx_checksum` at `00410030`        | checksum helper maps to `lt2_lsx_compute_checksum`                      |
+| `lemonade2.unpacked.packed_date` at `00418FF0`         | date scalar helper maps to `lt2_lsx_packed_date_scalar`                 |
+| `lemonade2.unpacked.lsx_connection_page` at `00420F10` | browser entry is a local `Lsx\CheckConnection.html` path                |
+| `teneon.load_url` at `10001210`                        | browser DLL only performs URL navigation                                |
 
 One compatibility edge case matters: the client sets its post-request flag when the expected token is present, but also when the HTTP helper itself fails. A successful HTTP response without `SUCCESS` is the case that leaves the upload flag clear. Returning the expected token remains the correct server behavior.
 

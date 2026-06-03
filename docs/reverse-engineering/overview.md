@@ -6,16 +6,16 @@ docs explain the current state and how to rebuild the evidence.
 
 ## Current State
 
-| Area | Status | Current reference |
-| --- | --- | --- |
-| Installed payload extraction | Reproducible | `docs/tools.md`, `lt2install` |
-| RB resource bundle | Structurally mapped | `docs/reverse-engineering/rb-format.md` |
-| Browser wrapper DLL | Demangled and summarized | `docs/reverse-engineering/teneon-exports.md` |
-| Packed game executable | Armadillo-style protector identified | `docs/reverse-engineering/static-unpacking.md` |
-| Normalized game target | Statically derivable | `docs/reverse-engineering/normalization.md` |
-| Ghidra annotations | Scripted from findings INI | `docs/reverse-engineering/ghidra.md` |
-| Recovered C/H artifacts | Organized by domain | `docs/reverse-engineering/recovered-source.md` |
-| Public LSX/server findings | Published in app content | `go/web/static/project/findings/content.md` |
+| Area                         | Status                               | Current reference                              |
+| ---------------------------- | ------------------------------------ | ---------------------------------------------- |
+| Installed payload extraction | Reproducible                         | `docs/tools.md`, `lt2install`                  |
+| RB resource bundle           | Structurally mapped                  | `docs/reverse-engineering/rb-format.md`        |
+| Browser wrapper DLL          | Demangled and summarized             | `docs/reverse-engineering/teneon-exports.md`   |
+| Packed game executable       | Armadillo-style protector identified | `docs/reverse-engineering/static-unpacking.md` |
+| Normalized game target       | Statically derivable                 | `docs/reverse-engineering/normalization.md`    |
+| Ghidra annotations           | Scripted from findings INI           | `docs/reverse-engineering/ghidra.md`           |
+| Recovered C/H artifacts      | Organized by domain                  | `docs/reverse-engineering/recovered-source.md` |
+| Public LSX/server findings   | Published in app content             | `go/web/static/project/findings/content.md`    |
 
 ## Important Paths
 

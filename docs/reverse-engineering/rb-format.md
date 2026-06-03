@@ -24,10 +24,10 @@ runtime has not yielded the original RB-loader function.
 `Lemonade2.rb` is a little-endian resource bundle with a fixed pre-segment area
 followed by a segment chain.
 
-| Range | Meaning | Notes |
-| --- | --- | --- |
+| Range                    | Meaning                          | Notes                                                                                                               |
+| ------------------------ | -------------------------------- | ------------------------------------------------------------------------------------------------------------------- |
 | `0x00000000..0x00001037` | application/static numeric table | Starts with `ff ff 20 03 58 02 10 00`; includes the segment-chain offset at `0x10` and a 1,032-dword numeric table. |
-| `0x00001038..EOF` | segment chain | Each segment starts with a 12-byte header. |
+| `0x00001038..EOF`        | segment chain                    | Each segment starts with a 12-byte header.                                                                          |
 
 The pre-segment area starts with a 24-byte header:
 
@@ -60,20 +60,20 @@ Every observed `next_offset` is forward and in bounds.
 
 ## Segment Chain
 
-| Type | Offset | Next | Payload bytes | Count/flags | Decoded status |
-| --- | ---: | ---: | ---: | ---: | --- |
-| `1` | `0x001038` | `0x007288` | `25,156` | `512` | string table, 704 strings |
-| `2` | `0x007288` | `0x1472D22` | `21,412,494` | `233` | bitmap/image records |
-| `3` | `0x1472D22` | `0x14F4ABA` | `531,852` | `22` | five PCM sample records |
-| `4` | `0x14F4ABA` | `0x14F92C8` | `18,434` | `1` | image-info/mosaic coordinate table |
-| `5` | `0x14F92C8` | `0x14FBC82` | `10,670` | `4` | four bitmap-font glyph tables |
-| `6` | `0x14FBC82` | `0x14FBC8E` | `0` | `0` | empty |
-| `7` | `0x14FBC8E` | `0x14FBC9A` | `0` | `0` | empty |
-| `8` | `0x14FBC9A` | `0x1A98452` | `5,883,820` | `15` | length-prefixed binary/music records |
-| `13` | `0x1A98452` | `0x1A9845E` | `0` | `0` | empty |
-| `11` | `0x1A9845E` | `0x1A9846A` | `0` | `0` | empty |
-| `12` | `0x1A9846A` | `0x1A98476` | `0` | `0` | empty |
-| `10` | `0x1A98476` | `0x1A9848E` | `12` | `1` | footer-like record `{0, file_size, 0}` |
+| Type | Offset      | Next        | Payload bytes | Count/flags | Decoded status                         |
+| ---- | ----------- | ----------- | ------------- | ----------- | -------------------------------------- |
+| `1`  | `0x001038`  | `0x007288`  | `25,156`      | `512`       | string table, 704 strings              |
+| `2`  | `0x007288`  | `0x1472D22` | `21,412,494`  | `233`       | bitmap/image records                   |
+| `3`  | `0x1472D22` | `0x14F4ABA` | `531,852`     | `22`        | five PCM sample records                |
+| `4`  | `0x14F4ABA` | `0x14F92C8` | `18,434`      | `1`         | image-info/mosaic coordinate table     |
+| `5`  | `0x14F92C8` | `0x14FBC82` | `10,670`      | `4`         | four bitmap-font glyph tables          |
+| `6`  | `0x14FBC82` | `0x14FBC8E` | `0`           | `0`         | empty                                  |
+| `7`  | `0x14FBC8E` | `0x14FBC9A` | `0`           | `0`         | empty                                  |
+| `8`  | `0x14FBC9A` | `0x1A98452` | `5,883,820`   | `15`        | length-prefixed binary/music records   |
+| `13` | `0x1A98452` | `0x1A9845E` | `0`           | `0`         | empty                                  |
+| `11` | `0x1A9845E` | `0x1A9846A` | `0`           | `0`         | empty                                  |
+| `12` | `0x1A9846A` | `0x1A98476` | `0`           | `0`         | empty                                  |
+| `10` | `0x1A98476` | `0x1A9848E` | `12`          | `1`         | footer-like record `{0, file_size, 0}` |
 
 ## Type 1: Strings
 
@@ -113,12 +113,12 @@ struct Lt2RbBitmapRecord {
 
 Observed formats:
 
-| Format low word | Count | Meaning |
-| --- | ---: | --- |
-| `0x8760` | 187 | RGB565 plus one alpha byte per pixel |
-| `0x0660` | 37 | RGB565 |
-| `0x20660` | 4 | RGB565 with high flag bits set; same pixel size as `0x0660` |
-| `0xC300` | 5 | 8-bit grayscale |
+| Format low word | Count | Meaning                                                     |
+| --------------- | ----- | ----------------------------------------------------------- |
+| `0x8760`        | 187   | RGB565 plus one alpha byte per pixel                        |
+| `0x0660`        | 37    | RGB565                                                      |
+| `0x20660`       | 4     | RGB565 with high flag bits set; same pixel size as `0x0660` |
+| `0xC300`        | 5     | 8-bit grayscale                                             |
 
 For RGB565 records, nonzero `flags` is an RGB chroma key encoded as
 `0x00RRGGBB`. The current extractor treats matching pixels as transparent.
@@ -143,12 +143,12 @@ embedded sample count; it matches the Clickteam-style bank convention of a
 maximum sound handle count rather than the number of stored payloads.
 
 | Index | Header offset | PCM bytes | Duration at 11008 Hz |
-| --- | ---: | ---: | ---: |
-| `0` | `0x1472D2E` | `38,264` | `1.738s` |
-| `1` | `0x147C2AE` | `38,916` | `1.768s` |
-| `2` | `0x1485ABA` | `22,014` | `1.000s` |
-| `3` | `0x148B0C0` | `394,354` | `17.912s` |
-| `4` | `0x14EB53A` | `38,264` | `1.738s` |
+| ----- | ------------- | --------- | -------------------- |
+| `0`   | `0x1472D2E`   | `38,264`  | `1.738s`             |
+| `1`   | `0x147C2AE`   | `38,916`  | `1.768s`             |
+| `2`   | `0x1485ABA`   | `22,014`  | `1.000s`             |
+| `3`   | `0x148B0C0`   | `394,354` | `17.912s`            |
+| `4`   | `0x14EB53A`   | `38,264`  | `1.738s`             |
 
 ## Type 4: Image Info / Mosaic Coordinates
 
@@ -204,12 +204,12 @@ struct Lt2RbGlyph {
 };
 ```
 
-| Subrecord | Relative short index | Relative byte offset | First shorts |
-| --- | ---: | ---: | --- |
-| `0` | `0` | `0x0000` | `-13, 12, 768, 0, 32, 41, 0, 0` |
-| `1` | `112` | `0x00E0` | `-14, 193, 768, 2, 32, 42, 10, 0` |
-| `2` | `1853` | `0x0E7A` | `-26, 193, 768, 7, 32, 69, 15, 0` |
-| `3` | `3594` | `0x1C14` | `-15, 193, 768, 5, 32, 28, 6, 0` |
+| Subrecord | Relative short index | Relative byte offset | First shorts                      |
+| --------- | -------------------- | -------------------- | --------------------------------- |
+| `0`       | `0`                  | `0x0000`             | `-13, 12, 768, 0, 32, 41, 0, 0`   |
+| `1`       | `112`                | `0x00E0`             | `-14, 193, 768, 2, 32, 42, 10, 0` |
+| `2`       | `1853`               | `0x0E7A`             | `-26, 193, 768, 7, 32, 69, 15, 0` |
+| `3`       | `3594`               | `0x1C14`             | `-15, 193, 768, 5, 32, 28, 6, 0`  |
 
 Subrecord 0 maps space, digits, and colon. Subrecords 1-3 each map 193
 CP1252-style character codes from `32..255` with gaps for unused codes.
@@ -229,23 +229,23 @@ All 15 records consume the segment exactly. Records `0` and `2` are FastTracker
 II XM modules; record `0` contains sample names such as `Amb_GCS_cart.wav`,
 `Amb_GCS_intercom.wav`, and `Amb_Bronx_loop.wav`.
 
-| Index | Data offset | Length | Identification |
-| --- | ---: | ---: | --- |
-| `0` | `0x14FBCAA` | `4,772,618` | FastTracker II module |
-| `1` | `0x1988FB8` | `43,736` | binary data |
-| `2` | `0x1993A94` | `1,036,218` | FastTracker II module |
-| `3` | `0x1A90A52` | `428` | binary data |
-| `4` | `0x1A90C02` | `240` | binary data |
-| `5` | `0x1A90CF6` | `3,082` | binary data |
-| `6` | `0x1A91904` | `210` | binary data |
-| `7` | `0x1A919DA` | `18` | binary data |
-| `8` | `0x1A919F0` | `384` | binary data |
-| `9` | `0x1A91B74` | `25,200` | binary data |
-| `10` | `0x1A97DE8` | `326` | binary data |
-| `11` | `0x1A97F32` | `80` | binary data |
-| `12` | `0x1A97F86` | `180` | binary data |
-| `13` | `0x1A9803E` | `912` | binary data |
-| `14` | `0x1A983D2` | `128` | binary data |
+| Index | Data offset | Length      | Identification        |
+| ----- | ----------- | ----------- | --------------------- |
+| `0`   | `0x14FBCAA` | `4,772,618` | FastTracker II module |
+| `1`   | `0x1988FB8` | `43,736`    | binary data           |
+| `2`   | `0x1993A94` | `1,036,218` | FastTracker II module |
+| `3`   | `0x1A90A52` | `428`       | binary data           |
+| `4`   | `0x1A90C02` | `240`       | binary data           |
+| `5`   | `0x1A90CF6` | `3,082`     | binary data           |
+| `6`   | `0x1A91904` | `210`       | binary data           |
+| `7`   | `0x1A919DA` | `18`        | binary data           |
+| `8`   | `0x1A919F0` | `384`       | binary data           |
+| `9`   | `0x1A91B74` | `25,200`    | binary data           |
+| `10`  | `0x1A97DE8` | `326`       | binary data           |
+| `11`  | `0x1A97F32` | `80`        | binary data           |
+| `12`  | `0x1A97F86` | `180`       | binary data           |
+| `13`  | `0x1A9803E` | `912`       | binary data           |
+| `14`  | `0x1A983D2` | `128`       | binary data           |
 
 ### Type 8 Record 1: Nested Zlib/RGB565 Screen
 

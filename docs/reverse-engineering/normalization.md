@@ -16,16 +16,16 @@ A useful Ghidra target needs the decrypted/decompressed normalized EXE staged at
 - Entry VA: `0x004D3000`
 - Protector/evidence strings: `ARMDEBUG=`, `Cannot locate protected program data`, `CreateProcessW`, `DebugActiveProcess`, `GetThreadContext`, `IsDebuggerPresent`, `SetFunctionAddresses`, `VirtualProtectEx`, `WriteProcessMemory`, `deflate 1.1.4`, `inflate 1.1.4`
 
-| Section | VA | Virtual Size | Raw Offset | Raw Size | Entropy |
-| --- | --- | ---: | ---: | ---: | ---: |
-| `.text` | `0x00401000` | `0x902D6` | `0x0` | `0x0` | 0.000 |
-| `.rdata` | `0x00492000` | `0x9AEE` | `0x0` | `0x0` | 0.000 |
-| `.data` | `0x0049C000` | `0x6578` | `0x0` | `0x0` | 0.000 |
-| `.text1` | `0x004A3000` | `0x30000` | `0x1000` | `0x30000` | 7.980 |
-| `.adata` | `0x004D3000` | `0x10000` | `0x31000` | `0xD000` | 7.011 |
-| `.data1` | `0x004E3000` | `0x20000` | `0x3E000` | `0x9000` | 3.039 |
-| `.pdata` | `0x00503000` | `0x80000` | `0x47000` | `0x71000` | 7.987 |
-| `.rsrc` | `0x00583000` | `0x3000` | `0xB8000` | `0x3000` | 3.514 |
+| Section  | VA           | Virtual Size | Raw Offset | Raw Size  | Entropy |
+| -------- | ------------ | ------------ | ---------- | --------- | ------- |
+| `.text`  | `0x00401000` | `0x902D6`    | `0x0`      | `0x0`     | 0.000   |
+| `.rdata` | `0x00492000` | `0x9AEE`     | `0x0`      | `0x0`     | 0.000   |
+| `.data`  | `0x0049C000` | `0x6578`     | `0x0`      | `0x0`     | 0.000   |
+| `.text1` | `0x004A3000` | `0x30000`    | `0x1000`   | `0x30000` | 7.980   |
+| `.adata` | `0x004D3000` | `0x10000`    | `0x31000`  | `0xD000`  | 7.011   |
+| `.data1` | `0x004E3000` | `0x20000`    | `0x3E000`  | `0x9000`  | 3.039   |
+| `.pdata` | `0x00503000` | `0x80000`    | `0x47000`  | `0x71000` | 7.987   |
+| `.rsrc`  | `0x00583000` | `0x3000`     | `0xB8000`  | `0x3000`  | 3.514   |
 
 ## Normalized Candidate
 
