@@ -1,5 +1,4 @@
 const shortV3Alphabet = "0123456789ABCDEFGHJKMNPQRTUVWXYZ";
-const format = "Armadillo ShortV3 signed key";
 const shortV3Level = 25;
 const shortV3LevelIndex = shortV3Level - 20;
 const shortV3CertSeed = 0xccf0580a;
@@ -21,15 +20,13 @@ const aktCRC32Table = buildAKTCRC32Table();
 export type KeygenPair = {
   registrationName: string;
   activationKey: string;
-  format: string;
 };
 
 export function generateActivationPair(requestedName: string): KeygenPair {
   const registrationName = requestedName.trim() || randomName(12);
   return {
     registrationName,
-    activationKey: generateSignedKey(registrationName, currentArmadilloDate(), randomSignatureSeed),
-    format
+    activationKey: generateSignedKey(registrationName, currentArmadilloDate(), randomSignatureSeed)
   };
 }
 

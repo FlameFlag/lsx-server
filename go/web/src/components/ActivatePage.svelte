@@ -6,12 +6,9 @@ import ProjectShell from "./ProjectShell.svelte";
 
 export let data: ProjectData;
 
-$: server = data.serverAddr || "127.0.0.1";
-
 let regName = "";
 let requestedName = "";
 let activationKey = "";
-let keyFormat = "";
 let keyError = "";
 
 onMount(() => {
@@ -26,12 +23,10 @@ function generateKey() {
     regName = pair.registrationName;
     if (!requested) requestedName = pair.registrationName;
     activationKey = pair.activationKey;
-    keyFormat = pair.format;
   } catch (e) {
     keyError = e instanceof Error ? e.message : "Failed to generate key";
     regName = "";
     activationKey = "";
-    keyFormat = "";
   }
 }
 </script>
@@ -40,38 +35,24 @@ function generateKey() {
   <article class="content-card activate-page">
     <header class="card-header">
       <section>
-        <p class="eyebrow">Registration and routing</p>
-        <h2 class="compact-heading">Generate a local REGISTER key and route LSX traffic</h2>
+        <p class="eyebrow">Registration</p>
+        <h2 class="compact-heading">Generate a local REGISTER key</h2>
         <p class="docs-copy">
-          Entering a generated name/key in the <strong>REGISTER</strong> dialog is normally a local Armadillo ShortV3
-          check. The same protected runtime also contains legacy Digital River SOAP paths for key issue, activation, and
-          validation; the hosts setup below catches those if this install/configuration tries to use them.
+          The <strong>REGISTER</strong> dialog verifies a signed key locally. The important rule is simple:
+          generate the key for the exact registration name you plan to type, then enter that same name/key pair together.
+          A valid key for one name is not valid for another name.
         </p>
       </section>
     </header>
-
-    <dl class="summary-grid" aria-label="Activation requirements">
-      <section class="docs-stat">
-        <dt>Server IP</dt>
-        <dd>{server}</dd>
-      </section>
-      <section class="docs-stat">
-        <dt>Required port</dt>
-        <dd>80 for LSX</dd>
-      </section>
-      <section class="docs-stat">
-        <dt>Key format</dt>
-        <dd>ShortV3</dd>
-      </section>
-    </dl>
 
     <section class="activate-grid" aria-label="Activation tools and checklist">
       <section class="activate-card keygen-panel">
         <p class="eyebrow">Step 1</p>
         <h3>Generate a REGISTER key</h3>
         <p>
-          The generated key is bound to the registration name. Armadillo normalizes case and whitespace, but changing
-          the actual name text or pairing the key with a different name fails before any network request is made.
+          The generated key is bound to the registration name. The verifier cooks the name by removing spaces, tabs,
+          and line breaks, then uppercasing ASCII letters. After that cooked name is mixed into the payload and
+          signature, changing the name means the key no longer proves the same message.
         </p>
 
         <div class="keygen-form">
@@ -101,10 +82,6 @@ function generateKey() {
               <dt>Activation key</dt>
               <dd><code class="activation-key">{activationKey}</code></dd>
             </section>
-            <section>
-              <dt>Format</dt>
-              <dd>{keyFormat}</dd>
-            </section>
           </dl>
         {/if}
       </section>
@@ -115,11 +92,10 @@ function generateKey() {
         <p>
           Run the game with the <code>REGISTER</code> argument and enter the generated name/key pair.
           <strong>Key Valid</strong>
-          means Armadillo accepted and stored the ShortV3 key locally.
+          means the game accepted and stored the key locally.
           <strong>Key Invalid</strong>
-          means the signature/name/seed check failed before any LSX traffic is involved. If the dialog chooses Customer
-          Service, Buy Now, reissue, or blank-key activation paths, Armadillo may instead send SOAP to the Digital River
-          URL stored in its protected configuration.
+          almost always means the key was generated for a different registration name than the one typed into the dialog.
+          Generate a fresh pair for the exact name you want to use, then copy both fields from that same pair.
         </p>
         <pre
           class="copy-block"
@@ -128,65 +104,29 @@ function generateKey() {
     </section>
 
     <section class="activate-section">
-      <p class="eyebrow">Step 3</p>
-      <h3>Route the original services to this server</h3>
-      <p>
-        Do this for LSX score sync/account creation and for Armadillo&apos;s recovered SOAP operations:
-        <code>generateKey</code>, <code>reissueKey</code>, <code>generateKeyForNoTrial</code>,
-        <code>validateLicense</code>, and <code>activateLicense</code>. The hosts file can redirect hostnames, but it
-        cannot redirect ports, so the game machine must reach this server on TCP port <code>80</code>.
-      </p>
-      <pre class="copy-block"># Lemonade Tycoon 2: LSX and Armadillo activation
-        {server}  gt.jamdat.ca
-        {server}  activate.digitalriver.com
-        {server}  swreg.org
-        {server}  activation.digitalriver.com
-      </pre>
-      <p class="muted">
-        Edit <code>C:\Windows\System32\drivers\etc\hosts</code> as Administrator, save, then run
-        <code>ipconfig /flushdns</code>. Confirm from the game machine that
-        <code>http://{server}/healthz</code>
-        returns <code>OK</code>.
-      </p>
-    </section>
-
-    <section class="activate-section">
-      <p class="eyebrow">What the server answers</p>
-      <div class="response-grid">
-        <section class="response-card">
-          <h4>Account creation</h4>
-          <p><code>gt.jamdat.ca/createaccount.php</code></p>
-          <strong><code>ACCEPT</code></strong>
-        </section>
-        <section class="response-card">
-          <h4>Score upload</h4>
-          <p><code>gt.jamdat.ca/syncgame.php?game=lemonade2</code></p>
-          <strong><code>SUCCESS</code></strong>
-        </section>
-        <section class="response-card">
-          <h4>LSX pages</h4>
-          <p><code>/lsx2.php</code> and recovered score detail frames</p>
-          <strong>Recovered leaderboard HTML</strong>
-        </section>
-        <section class="response-card">
-          <h4>DRM activation</h4>
-          <p>Legacy XML/SOAP <code>POST</code> traffic to the Digital River activation host/path</p>
-          <strong><code>&lt;result&gt;0&lt;/result&gt;</code> plus key fields when required</strong>
-        </section>
-      </div>
-    </section>
-
-    <section class="activate-section">
-      <p class="eyebrow">ShortV3 math</p>
+      <p class="eyebrow">Algorithm</p>
       <h3>How the key is actually built</h3>
       <p>
-        The key is a signed, name-bound ShortV3 payload. The game does not just compare a string. It decodes the key,
-        decrypts a small payload with a stream derived from the registration name, hashes that payload together with the
-        same cooked name, then verifies an ElGamal-style signature against the public certificate embedded in the
-        protected data.
+        The game does not compare the key text directly. It decodes the key into bytes, unmasks a small payload with a
+        stream derived from the registration name, hashes the payload together with that same name, then verifies a
+        public-key signature embedded in the key.
       </p>
+      <dl class="algorithm-notes" aria-label="Verifier data flow">
+        <section>
+          <dt>Decoder output</dt>
+          <dd>masked payload bytes, then alternating little-endian signature bytes for <code>a</code> and <code>b</code></dd>
+        </section>
+        <section>
+          <dt>Name input</dt>
+          <dd>the dialog text after whitespace removal and ASCII uppercase conversion</dd>
+        </section>
+        <section>
+          <dt>Success condition</dt>
+          <dd>license seed matches and the public ElGamal equation verifies for that cooked name</dd>
+        </section>
+      </dl>
 
-      <div class="math-flow" aria-label="ShortV3 keygen math">
+      <div class="math-flow" aria-label="Activation key math">
         <section class="math-card">
           <h4>1. Cook the name</h4>
           <p>
@@ -221,7 +161,7 @@ function generateKey() {
         <section class="math-card">
           <h4>4. Sign the payload and name</h4>
           <p>
-            ShortV3 level 25 uses a 9-byte group. The modulus is <code>p = 2^72 + 0xE3B</code>, the generator is
+            The recovered verifier uses a 9-byte group. The modulus is <code>p = 2^72 + 0xE3B</code>, the generator is
             <code>0xF3C7E00A4B58155299</code>, and the public certificate is <code>0x9CC50E4D25416464B9</code>. The
             private exponent recovered for this project is <code>0x70301169DE7C75D66F</code>, satisfying
             <code>public = generator^private mod p</code>.
@@ -259,19 +199,9 @@ function generateKey() {
         <p class="eyebrow">Troubleshooting</p>
         <h3>If REGISTER says Key Invalid</h3>
         <p>
-          Generate a fresh pair and copy both fields. The local verifier checks the ShortV3 signature, decrypts the
-          payload with a name-derived stream, and checks the embedded license seed. This path does not make an HTTP
-          request.
-        </p>
-      </section>
-
-      <section class="activate-card">
-        <p class="eyebrow">Troubleshooting</p>
-        <h3>If online features still hit the old servers</h3>
-        <p>
-          Re-check the hosts entries for the Digital River host actually present in the protected configuration, flush
-          DNS, and verify port <code>80</code>. If this Windows install already stored a bad/expired license state,
-          remove only this game&apos;s Jamdat or Armadillo registry values after exporting a backup.
+          Use the exact same registration name/key pair. The name is not cosmetic: it changes the key stream and the
+          signed message. A typo, a different company/person name, or a key copied from an older generated pair will fail
+          before any HTTP or LSX code runs.
         </p>
       </section>
     </section>

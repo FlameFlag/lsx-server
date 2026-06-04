@@ -401,7 +401,8 @@ examples:
       status: 200
       contains:
         - data-page="findings"
-        - Lemonade2.rb is a resource container
+        - Use the language tabs on each implementation sample
+        - Resource container
         - /project/asset/svelte/
       not_contains:
         - /admin

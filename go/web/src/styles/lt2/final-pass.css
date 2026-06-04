@@ -475,6 +475,115 @@
     @apply w-full px-2;
   }
 
+  .content-card,
+  .leaderboard-card,
+  .admin-card {
+    @apply border-white bg-lt2-panel/82 shadow-[inset_0_2px_0_rgba(255,255,255,.78),0_4px_7px_rgba(64,116,28,.26)];
+  }
+
+  .content-card {
+    @apply relative overflow-hidden;
+  }
+
+  .content-card::before {
+    @apply pointer-events-none absolute inset-x-4 top-3 h-9 rounded-[50%] content-[''];
+    background: radial-gradient(ellipse at center top, rgba(255, 255, 255, 0.42), transparent 68%);
+  }
+
+  .content-card > * {
+    @apply relative z-10;
+  }
+
+  .docs-title {
+    @apply font-display text-[34px] leading-none text-lt2-heading;
+    text-shadow: 0 1px 0 rgba(255, 255, 255, 0.72);
+  }
+
+  .docs-copy,
+  .activate-card p,
+  .activate-section p,
+  .endpoint-card p,
+  .findings-root p {
+    @apply text-[#405f2a];
+  }
+
+  .docs-stat,
+  .algorithm-notes section,
+  .keygen-output,
+  .endpoint-grid section {
+    @apply rounded-lg border-2 border-[#9dca45] bg-[#f2ffd2]/88 shadow-[inset_0_2px_0_rgba(255,255,255,.72)];
+  }
+
+  .docs-stat dt,
+  .algorithm-notes dt,
+  .keygen-output dt,
+  .endpoint-grid dt {
+    @apply font-display text-[13px] leading-none text-[#4b7c24];
+    text-shadow: 0 1px 0 rgba(255, 255, 255, 0.7);
+  }
+
+  .docs-stat dd {
+    @apply font-display text-[30px] leading-none text-lt2-heading;
+  }
+
+  .endpoint-card,
+  .sample-card,
+  .activate-section,
+  .activate-card,
+  .math-card,
+  .findings-hero,
+  .findings-nav {
+    @apply rounded-xl border-2 border-white bg-lt2-surface/82 shadow-[inset_0_2px_0_rgba(255,255,255,.78),0_3px_5px_rgba(83,142,30,.24)];
+    background-image: repeating-linear-gradient(
+      0deg,
+      rgba(255, 255, 255, 0.26) 0 11px,
+      rgba(145, 211, 52, 0.09) 11px 22px
+    );
+  }
+
+  .endpoint-head code,
+  .keygen-output code,
+  .copy-block,
+  .sample-card pre,
+  .findings-code {
+    @apply rounded-md border border-[#385b33] bg-[#111d13] text-[#e7ffd5] shadow-[inset_0_1px_0_rgba(255,255,255,.08)];
+    background-image: radial-gradient(rgba(63, 255, 203, 0.16) 1px, transparent 1px);
+    background-size: 6px 6px;
+  }
+
+  .keygen-output code,
+  .copy-block {
+    @apply text-[#d5fff8];
+  }
+
+  .endpoint-method,
+  .findings-code-toolbar button,
+  .sort-link {
+    @apply rounded-lg;
+  }
+
+  .findings-hero h2,
+  .findings-root h2,
+  .activate-card h3,
+  .activate-section h3,
+  .math-card h4 {
+    @apply font-display leading-none text-lt2-heading;
+    text-shadow: 0 1px 0 rgba(255, 255, 255, 0.72);
+  }
+
+  .findings-nav a,
+  .findings-code-frame figcaption {
+    @apply rounded-md border-2 border-[#9dca45] bg-[#f4ffd8] text-lt2-heading shadow-lt2-inset;
+  }
+
+  .findings-code-frame {
+    @apply border-white bg-[#dfff9c]/58 p-2 shadow-[inset_0_2px_0_rgba(255,255,255,.72),0_3px_5px_rgba(83,142,30,.24)];
+  }
+
+  .findings-code-frame figcaption {
+    @apply mb-2 border-b-2 px-3 py-2;
+  }
+
   @media (max-width: 900px) {
     .admin-brand-header {
       @apply grid-cols-1 gap-4 px-4 py-5;

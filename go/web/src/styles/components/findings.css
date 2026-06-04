@@ -42,11 +42,15 @@
   }
 
   .findings-nav {
-    @apply my-5 grid gap-2 rounded-lg border-2 border-lsx-border bg-[#eef6bd] p-3 md:grid-cols-2 xl:grid-cols-3;
+    @apply grid gap-2 rounded-lg border-2 border-lsx-border bg-[#eef6bd] p-3 md:grid-cols-2 xl:grid-cols-3;
   }
 
   .findings-nav a {
     @apply rounded-md bg-white px-3 py-2 text-sm no-underline hover:bg-[#fff8b9];
+  }
+
+  .findings-controls {
+    @apply my-5 grid gap-3;
   }
 
   .findings-markdown {
@@ -69,11 +73,44 @@
     @apply border-t border-[#cbdc8a] px-3 py-2 align-top;
   }
 
+  .findings-code-frame {
+    @apply mt-4 overflow-hidden rounded-lg border-2 border-lsx-border bg-[#f6f8fa];
+  }
+
+  .findings-code-frame figcaption {
+    @apply border-b-2 border-lsx-border bg-[#eef6bd] px-3 py-1.5 text-xs font-black uppercase tracking-wide text-[#5f7b2e];
+  }
+
+  .findings-code-frame.implementation-sample figcaption {
+    @apply bg-[#fff8b9] text-lsx-ink;
+  }
+
+  .findings-code-toolbar {
+    @apply flex flex-wrap items-center justify-between gap-2;
+  }
+
+  .findings-code-toolbar span {
+    @apply text-xs font-black uppercase tracking-wide;
+  }
+
+  .findings-code-toolbar div {
+    @apply flex flex-wrap gap-1.5;
+  }
+
+  .findings-code-toolbar button {
+    @apply rounded-md border-2 border-[#96b94a] bg-[#f7ffd8] px-2 py-1 text-xs font-black text-lsx-ink hover:bg-white;
+  }
+
+  .findings-code-toolbar button.active {
+    @apply border-[#426f1f] bg-lsx-action;
+  }
+
   .findings-code {
-    @apply mt-4 overflow-x-auto rounded-lg border-2 border-lsx-border bg-[#f6f8fa] p-0 font-mono text-sm;
+    @apply overflow-x-hidden p-0 font-mono text-sm;
   }
 
   .findings-code code {
-    @apply block bg-transparent p-4;
+    @apply block whitespace-pre-wrap bg-transparent p-4;
+    overflow-wrap: anywhere;
   }
 }
