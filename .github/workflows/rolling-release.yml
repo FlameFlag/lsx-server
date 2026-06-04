@@ -1,0 +1,164 @@
+name: Rolling Release
+
+on:
+  push:
+    branches:
+      - master
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: rolling-release
+  cancel-in-progress: true
+
+env:
+  RELEASE_TAG: latest
+
+jobs:
+  build:
+    name: Build ${{ matrix.id }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - target: linux/amd64
+            id: linux_amd64
+          - target: linux/arm64
+            id: linux_arm64
+          - target: darwin/amd64
+            id: darwin_amd64
+          - target: darwin/arm64
+            id: darwin_arm64
+          - target: windows/amd64
+            id: windows_amd64
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version-file: go/go.mod
+          cache-dependency-path: go/go.sum
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+          cache-dependency-path: go/web/package-lock.json
+
+      - name: Build release binary
+        env:
+          TARGET: ${{ matrix.target }}
+          VERSION: ${{ github.sha }}
+        run: |
+          bash ./build.sh --target "$TARGET" --version "${VERSION::12}" --skip-checks --skip-tools
+
+      - name: Package release archive
+        env:
+          TARGET: ${{ matrix.target }}
+        run: |
+          set -euo pipefail
+
+          os="${TARGET%/*}"
+          arch="${TARGET#*/}"
+          target_id="${os}_${arch}"
+          package_name="lsx-server-${target_id}"
+          package_dir="package/${package_name}"
+          mkdir -p "$package_dir" release-assets
+
+          binary="dist/lsx-server_${os}_${arch}"
+          archive="release-assets/${package_name}.tar.gz"
+          if [[ "$os" == "windows" ]]; then
+            binary="${binary}.exe"
+            archive="release-assets/${package_name}.zip"
+          fi
+
+          cp "$binary" "$package_dir/"
+          cp README.md LICENSE "$package_dir/"
+
+          if [[ "$os" == "windows" ]]; then
+            (cd package && zip -r "../$archive" "$package_name")
+          else
+            tar -czf "$archive" -C package "$package_name"
+          fi
+
+      - name: Upload release artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: release-${{ matrix.id }}
+          path: release-assets/*
+          if-no-files-found: error
+
+  release:
+    name: Publish latest release
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Download release artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: release-assets
+          merge-multiple: true
+
+      - name: Write release notes
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+          SHA: ${{ github.sha }}
+        run: |
+          set -euo pipefail
+
+          previous_sha="$(git ls-remote --tags origin "refs/tags/${RELEASE_TAG}" | awk '{print $1}')"
+          {
+            printf 'Rolling release for `%s`.\n\n' "${SHA::12}"
+            printf 'This release is replaced automatically whenever `%s` receives new commits.\n\n' "${GITHUB_REF_NAME}"
+            printf '## Changes\n\n'
+            if [[ -n "$previous_sha" ]]; then
+              git log --oneline --no-decorate "${previous_sha}..${SHA}" | sed 's/^/- /'
+            else
+              git log --oneline --no-decorate -n 20 "$SHA" | sed 's/^/- /'
+            fi
+          } > RELEASE_NOTES.md
+
+      - name: Move latest tag
+        env:
+          SHA: ${{ github.sha }}
+        run: |
+          set -euo pipefail
+          git tag --force "$RELEASE_TAG" "$SHA"
+          git push --force origin "refs/tags/${RELEASE_TAG}"
+
+      - name: Publish GitHub release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+
+          if gh release view "$RELEASE_TAG" >/dev/null 2>&1; then
+            gh release edit "$RELEASE_TAG" \
+              --title "Latest rolling release" \
+              --notes-file RELEASE_NOTES.md \
+              --target "$GITHUB_SHA" \
+              --latest
+          else
+            gh release create "$RELEASE_TAG" \
+              --title "Latest rolling release" \
+              --notes-file RELEASE_NOTES.md \
+              --target "$GITHUB_SHA" \
+              --latest
+          fi
+
+          find release-assets -maxdepth 1 -type f -print0 \
+            | xargs -0 gh release upload "$RELEASE_TAG" --clobber
