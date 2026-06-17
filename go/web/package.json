@@ -20,7 +20,7 @@
     "slugify": "^1.6.9",
     "svelte": "^5.55.10",
     "tailwindcss": "^4.3.0",
-    "vite": "^8.0.14"
+    "vite": "^8.0.16"
   },
   "devDependencies": {
     "@tsconfig/svelte": "^5.0.8",
